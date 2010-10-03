@@ -1,0 +1,4 @@
+%li
+  %a!href="$root$/$url$" $title$
+  \-
+  %em $date$
