@@ -23,9 +23,12 @@ import Control.Monad (forM_, liftM)
 import Data.Either (Either(..))
 import Data.Char (toUpper)
 
+blogTitle = "Greg Weber's Blog" :: String
+blogAuthor = "Greg Weber" :: String
+
 myConfig :: HakyllConfiguration
 myConfig = (defaultHakyllConfiguration "http://blog.gregweber.info")
-    -- { enableNoHtmlUrl = True }
+    { enableNoHtmlUrl = True }
 
 main = hakyllWithConfiguration myConfig $ do
     -- Static directory.
@@ -35,12 +38,23 @@ main = hakyllWithConfiguration myConfig $ do
     postPaths <- liftM (reverse . sort) $ getRecursiveContents "posts"
     let renderablePosts = map ((>>> postManipulation) . createPage) postPaths
 
+    let renderSite template = renderChain (template:["templates/default.html.hamlet"]) . withSidebar
+        withSidebar = flip combine $ do
+          let list = createPostListing "dummy" (take 3 renderablePosts) [("title", Left "Recent Posts")]
+          let sidebar = renderAndConcat ["sidebar.html.hamlet"] [list]
+          createCustomPage "dummy" [("sidebar", Right sidebar)]
+
+        -- TODO: paginate
+        renderPostList url title posts = do
+          let list = createPostListing url posts [("title", Left title)]
+          renderSite "posts.html.hamlet" list
+
     -- Read tag map.
     let tagMap = readTagMap "postTags" postPaths
 
     -- Render all posts list.
     renderPostList "posts.html" "All posts" renderablePosts
-
+    
     -- Render post list per tag
     let renderListForTag tag posts =
             renderPostList (tagToUrl tag) ("Posts tagged " ++ tag)
@@ -49,22 +63,20 @@ main = hakyllWithConfiguration myConfig $ do
 
     -- Render index, including recent posts.
     let tagCloud = tagMap >>> renderTagCloud tagToUrl 100 200
-        index = createListing "index.html"
-                              ["templates/postitem.html.hamlet"]
+        index = createPostListing "index.html"
                               (take 3 renderablePosts)
                               [ ("title", Left "Home")
                               , ("tagcloud", Right tagCloud)
                               ]
-    renderChain ["index.html.hamlet", "templates/default.html.hamlet"] index
+
+    renderSite "index.html.hamlet" index
 
     -- Render all posts.
-    forM_ renderablePosts $ renderChain [ "templates/post.html.hamlet"
-                                        , "templates/default.html.hamlet"
-                                        ]
+    forM_ renderablePosts $ renderSite "templates/post.html.hamlet"
 
     renderFeeds "all" renderablePosts
     withTagMap tagMap $ \tag posts ->
-      when (tag == "haskell") $ renderFeeds tag posts
+      when (tag `elem` ["haskell"]) $ renderFeeds tag posts
 
   where
     postManipulation =   renderDate "date" "%B %e, %Y" "Date unknown"
@@ -72,20 +84,15 @@ main = hakyllWithConfiguration myConfig $ do
 
     tagToUrl tag = "$root/tags/" ++ removeSpaces tag ++ ".html"
 
-    renderPostList url title posts = do
-        let list = createListing url ["templates/postitem.html.hamlet"]
-                                 posts [("title", Left title)]
-        renderChain ["posts.html.hamlet", "templates/default.html.hamlet"] list
 
-    postFields posts =
-        map (>>> copyValue "body" "description") posts
-
-    blogTitle = "Greg Weber's Blog"
-    blogAuthor = "Greg Weber"
+    createPostListing url posts values =
+        createListing url ["templates/postitem.html.hamlet"] posts values
 
     renderFeeds tag posts = do
-      renderRss  (feedConfiguration "xml"  tag) $ postFields (take 3 posts)
-      renderAtom (feedConfiguration "atom" tag) $ postFields (take 3 posts)
+      renderRss  (feedConfiguration "rss" tag) $ map postWithDescription (take 3 posts)
+      renderAtom (feedConfiguration "atom" tag) $ map postWithDescription (take 3 posts)
+
+    postWithDescription = (>>> copyValue "body" "description")
 
     feedConfiguration format tag = FeedConfiguration
         { feedUrl         = tag ++ "." ++ format
