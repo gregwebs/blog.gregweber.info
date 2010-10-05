@@ -20,8 +20,8 @@ import Control.Monad (forM_, liftM)
 import Data.Either (Either(..))
 import Data.Char (toUpper)
 
-blogTitle = "Greg Weber's Blog" :: String
-blogAuthor = "Greg Weber" :: String
+blogTitle = "Greg Weber's Blog"
+blogAuthor = "Greg Weber"
 
 myConfig :: HakyllConfiguration
 myConfig = (defaultHakyllConfiguration "http://blog.gregweber.info")
