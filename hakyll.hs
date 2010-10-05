@@ -1,8 +1,5 @@
--- pagination when I create a second post (use module)
--- sidebar navigation
--- uploading
-  -- cd _site && rsync -av --delete./  www-data@gregweber.info:/var/www/blog.gregweber.info/
-  -- can I add a command to hakyll for ./hakyll upload ?
+-- uploading -- can I add a command to hakyll for ./hakyll upload ?
+-- cd _site && rsync -av --delete./  www-data@gregweber.info:/var/www/blog.gregweber.info/
 module Main where
 
 import Control.Arrow ((>>>))
@@ -31,10 +28,8 @@ myConfig = (defaultHakyllConfiguration "http://blog.gregweber.info")
     { enableNoHtmlUrl = True }
 
 main = hakyllWithConfiguration myConfig $ do
-    -- Static directory.
-    directory css "css"
+    directory css "css" -- Static directory.
 
-    -- Find all post paths.
     postPaths <- liftM (reverse . sort) $ getRecursiveContents "posts"
     let renderablePosts = map ((>>> postManipulation) . createPage) postPaths
 
@@ -44,15 +39,13 @@ main = hakyllWithConfiguration myConfig $ do
           let sidebar = renderAndConcat ["sidebar.html.hamlet"] [list]
           createCustomPage "dummy" [("sidebar", Right sidebar)]
 
-        -- TODO: paginate
-        renderPostList url title posts = do
+        renderPostList url title posts = do -- TODO: paginate
           let list = createPostListing url posts [("title", Left title)]
           renderSite "posts.html.hamlet" list
 
-    -- Read tag map.
     let tagMap = readTagMap "postTags" postPaths
 
-    -- Render all posts list.
+    -- Render all posts
     renderPostList "posts.html" "All posts" renderablePosts
     
     -- Render post list per tag
@@ -68,15 +61,15 @@ main = hakyllWithConfiguration myConfig $ do
                               [ ("title", Left "Home")
                               , ("tagcloud", Right tagCloud)
                               ]
-
     renderSite "index.html.hamlet" index
 
-    -- Render all posts.
+    -- Render each post.
     forM_ renderablePosts $ renderSite "templates/post.html.hamlet"
 
-    renderFeeds "all" renderablePosts
+    -- rss feed for all posts and tagged posts
+    renderFeeds "all" renderablePosts 3
     withTagMap tagMap $ \tag posts ->
-      when (tag `elem` ["haskell"]) $ renderFeeds tag posts
+      when (tag `elem` ["haskell"]) $ renderFeeds tag posts 3
 
   where
     postManipulation =   renderDate "date" "%B %e, %Y" "Date unknown"
@@ -84,13 +77,12 @@ main = hakyllWithConfiguration myConfig $ do
 
     tagToUrl tag = "$root/tags/" ++ removeSpaces tag ++ ".html"
 
-
     createPostListing url posts values =
         createListing url ["templates/postitem.html.hamlet"] posts values
 
-    renderFeeds tag posts = do
-      renderRss  (feedConfiguration "rss" tag) $ map postWithDescription (take 3 posts)
-      renderAtom (feedConfiguration "atom" tag) $ map postWithDescription (take 3 posts)
+    renderFeeds tag posts n = do
+      renderRss  (feedConfiguration "rss" tag) $ map postWithDescription (take n posts)
+      renderAtom (feedConfiguration "atom" tag) $ map postWithDescription (take n posts)
 
     postWithDescription = (>>> copyValue "body" "description")
 
