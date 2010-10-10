@@ -20,7 +20,7 @@ import Control.Monad (forM_, liftM)
 import Data.Either (Either(..))
 import Data.Char (toUpper)
 
-blogTitle = "Greg Weber's Blog"
+blogTitle = "Greg Weber's Programming Blog"
 blogAuthor = "Greg Weber"
 
 myConfig :: HakyllConfiguration
@@ -37,7 +37,7 @@ main = hakyllWithConfiguration myConfig $ do
         withSidebar = flip combine $ do
           let list = createPostListing "dummy" (take 3 renderablePosts) [("title", Left "Recent Posts")]
           let sidebar = renderAndConcat ["sidebar.html.hamlet"] [list]
-          createCustomPage "dummy" [("sidebar", Right sidebar)]
+          createCustomPage "dummy" [("sidebar", Right sidebar), ("blogTitle", Left blogTitle)]
 
         renderPostList url title posts = do -- TODO: paginate
           let list = createPostListing url posts [("title", Left title)]
@@ -67,9 +67,9 @@ main = hakyllWithConfiguration myConfig $ do
     forM_ renderablePosts $ renderSite "templates/post.html.hamlet"
 
     -- rss feed for all posts and tagged posts
-    renderFeeds "all" renderablePosts 3
+    renderFeeds "all" (take 3 renderablePosts)
     withTagMap tagMap $ \tag posts ->
-      when (tag `elem` ["haskell"]) $ renderFeeds tag posts 3
+      when (tag `elem` ["haskell"]) $ renderFeeds tag (take 3 posts)
 
   where
     postManipulation =   renderDate "date" "%B %e, %Y" "Date unknown"
@@ -80,9 +80,9 @@ main = hakyllWithConfiguration myConfig $ do
     createPostListing url posts values =
         createListing url ["templates/postitem.html.hamlet"] posts values
 
-    renderFeeds tag posts n = do
-      renderRss  (feedConfiguration "rss" tag) $ map postWithDescription (take n posts)
-      renderAtom (feedConfiguration "atom" tag) $ map postWithDescription (take n posts)
+    renderFeeds tag posts = do
+      renderRss  (feedConfiguration "rss" tag) $ map postWithDescription posts
+      renderAtom (feedConfiguration "atom" tag) $ map postWithDescription posts
 
     postWithDescription = (>>> copyValue "body" "description")
 

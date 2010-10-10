@@ -2,7 +2,7 @@
 %html!lang="en"!"xml:lang"="en"!xmlns="http://www.w3.org/1999/xhtml"
   %head
     %meta!content="text/html; charset=UTF-8"!"http-equiv"="Content-Type"
-    %title Greg Weber's Blog - $title$
+    %title $blogTitle$ - $title$
     %link!href="$root$/css/screen.css"!rel="stylesheet"!type="text/css"
     %link!href="http://example.com/rss.xml"!rel="alternate"!title="SimpleBlog"!type="application/rss+xml"
     %script!type="text/javascript"
@@ -20,7 +20,7 @@
 
   %body
     #wrap
-      %h1.blog-title Greg Weber's Blog
+      %h1.blog-title $blogTitle$
       #navigation
         %a!href="$root$/" Home
         %a!href="$root$/posts" All posts

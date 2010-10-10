@@ -11,7 +11,7 @@ I am moving here from [blog.thoughtfolder.com](blog.thoughtfolder.com) which I m
 
 I wanted to try out some new things for the infrastructure. I will still be using a static blog generator, but I am trying out the haskell generator that is available called [hakyll](http://jaspervdj.be/hakyll/). I have been programming in Ruby every day for a few years now, so I look to other language to learn more. Using more tools written with them is one way to further that. I would still highly recommend [Rassmalog](rassmalog.rubyforge.org/), the Ruby static blog engine I was using, although it other Ruby static site generators seemed to have won more popularity. As a rubyist, probably all of the ruby static site generators are much easier for me to configure/program. Learning to use arrows in hakyll has been a challenge for my brain.
 
-Hakyll is actually a static site generator, but you can download a tutorial that has a full blog setup. I really like how the preview seems to just work while making changes, although I am wary that things might slow down when I accumulate a lot of posts. There is already some experimentation on github with changes to use multiple cores though.
+Hakyll is actually a static site generator, but you can download a tutorial that has a full blog setup. I really like how the preview seems to just work while making changes, although things might slow down when I accumulate a lot of posts.
 
 ~~~
 ghc --make hakyll.hs && ./hakyll preview
@@ -38,3 +38,39 @@ Using Hamlet
 One thing that helped with the decision for hakyll was hamlet support. I didn't see any explicit documentation for this feature. It turns out you just need to change the file names given to `renderChain`, so `index.html` will now be `index.html.hamlet`. To generate hamlet from the given blog html I used the ruby haml toolset (requires a ruby installation and `gem install haml hpricot`). Here is my shell converter (a little zsh specific). It get things most of the way there- then I just had to fix the doctype. My shell fu is not that good. I wish I had spent the time towards creating a real html2hamlet converter- I don't see why it would be that hard using something like TagSoup.
 
     for f (*.html templates/*.html) html2haml --no-erb  $f | sed 's/\($[a-zA-Z]\+\)/\1$/g' | sed 's/ => /=/g' | sed 's/, :/!/g' | sed 's/", "/"!"/' | sed 's/{:\(.*\)}/!\1/g' | sed 's/"\/$/"/'  >| $f.hamlet
+
+
+Hakyll limitations
+------------------
+
+I really like the capabilities that hakyll brings- creating static
+sites with all the logic in the configuration file and nothing more
+than simple variable substitution in the templating.
+I think that improvements can be made so that writing the site configuration can be easier.
+Jasper Van der Jeugt, the author has been responsive about my patches and ideas to improve things.
+
+Here is a canidate for improvement: on my blog I would like to render a sidebar on each page that is
+equivalent to the post listing on the index page
+
+    let renderSite template =
+          renderChain (template:["templates/default.html.hamlet"]) . withSidebar
+
+That looks great- I just had to add `.withSidebar`,  but now lets look at the implementation:
+
+    let withSidebar = flip combine $ do
+          let list = createPostListing "dummy" (take 3 renderablePosts) [("title", Left "Recent Posts")]
+          let sidebar = renderAndConcat ["sidebar.html.hamlet"] [list]
+          createCustomPage "dummy" [("sidebar", Right sidebar)]
+    where
+      createPostListing url posts values =
+        createListing url ["templates/postitem.html.hamlet"] posts values
+
+Now I have 2 instance of "dummy" in one function, which makes me feel like a dummy.
+Also I am using renderAndConcat which takes lists to render multiple templates, but I only need to render one.
+
+It is very possible that I still don't understand how hakyll is supposed to be used.
+From my limited understanding, it seems that hakyll works great for rendering templates into pages, but does not work very easily for rendering "partials"- templates that will be included into other templates.
+
+My config file is dangerously close to violating Hakyll philosophy of being < 100 lines.
+I could envision haskellers writing their blogs and other simple sites in Hakyll and sharing their configuraiton file settings, much like in Xmonad.
+Something like the Xmonad.Contrib could keep configuration file sizes down in size.
