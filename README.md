@@ -1,1 +1,1 @@
-the source for <blog.gregweber.info>
+the source for http://blog.gregweber.info
