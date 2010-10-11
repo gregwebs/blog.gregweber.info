@@ -47,29 +47,13 @@ I really like the capabilities that hakyll brings- creating static
 sites with all the logic in the configuration file and nothing more
 than simple variable substitution in the templating.
 I think that improvements can be made so that writing the site configuration can be easier.
-Jasper Van der Jeugt, the author has been responsive about my patches and ideas to improve things.
-
-Here is a canidate for improvement: on my blog I would like to render a sidebar on each page that is
-equivalent to the post listing on the index page
-
-    let renderSite template =
-          renderChain (template:["templates/default.html.hamlet"]) . withSidebar
-
-That looks great- I just had to add `.withSidebar`,  but now lets look at the implementation:
+Jasper Van der Jeugt, the author has been responsive about my patches and ideas to improve things, and is continuing to actively develop Hakyll.
+My biggest complaint right now is that there isn't a simple way to render templates within other templates. For my sidebar I have to use "dummy" strings.
 
     let withSidebar = flip combine $ do
           let list = createPostListing "dummy" (take 3 renderablePosts) [("title", Left "Recent Posts")]
           let sidebar = renderAndConcat ["sidebar.html.hamlet"] [list]
           createCustomPage "dummy" [("sidebar", Right sidebar)]
-    where
-      createPostListing url posts values =
-        createListing url ["templates/postitem.html.hamlet"] posts values
-
-Now I have 2 instance of "dummy" in one function, which makes me feel like a dummy.
-Also I am using renderAndConcat which takes lists to render multiple templates, but I only need to render one.
-
-It is very possible that I still don't understand how hakyll is supposed to be used.
-From my limited understanding, it seems that hakyll works great for rendering templates into pages, but does not work very easily for rendering "partials"- templates that will be included into other templates.
 
 My config file is dangerously close to violating Hakyll philosophy of being < 100 lines.
 I could envision haskellers writing their blogs and other simple sites in Hakyll and sharing their configuraiton file settings, much like in Xmonad.
