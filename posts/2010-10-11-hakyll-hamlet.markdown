@@ -59,3 +59,5 @@ My config file is dangerously close to violating Hakyll philosophy that a site c
 I could envision haskellers writing their blogs and other simple sites in Hakyll and sharing their configuraiton file settings, much like in Xmonad.
 Something like the Xmonad.Contrib could keep configuration file sizes down in size.
 But I think hakyll is a little difficult to approach for those new to arrows like me, so I doubt it will ever gain a large user base.
+
+My blog source is on github for anyone that wants to see my [config file](http://github.com/gregwebs/blog.gregweber.info/blob/master/hakyll.hs).
