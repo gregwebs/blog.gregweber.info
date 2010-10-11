@@ -28,8 +28,7 @@
         #content
           $body$
         #sidebar
-          #menu
-            $sidebar$
+          $sidebar$
       #footer
         %hr
         by Greg Weber

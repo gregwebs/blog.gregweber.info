@@ -9,7 +9,7 @@ Welcome!
 
 I am moving here from [blog.thoughtfolder.com](blog.thoughtfolder.com) which I may redirect here in the future. Expect this site to contain mostly highly nerdy technical posts like the last.
 
-I wanted to try out some new things for the infrastructure. I will still be using a static blog generator, but I am trying out the haskell generator that is available called [hakyll](http://jaspervdj.be/hakyll/). I have been programming in Ruby every day for a few years now, so I look to other language to learn more. Using more tools written with them is one way to further that. I would still highly recommend [Rassmalog](rassmalog.rubyforge.org/), the Ruby static blog engine I was using, although it other Ruby static site generators seemed to have won more popularity. As a rubyist, probably all of the ruby static site generators are much easier for me to configure/program. Learning to use arrows in hakyll has been a challenge for my brain.
+I wanted to try out some new things for the infrastructure. I will still be using a static blog generator, but I am trying out the haskell generator that is available called [hakyll](http://jaspervdj.be/hakyll/). I have been programming in Ruby every day for a few years now, so I look to other language to learn more. Using more tools written with them is one way to further that. I would still highly recommend [Rassmalog](rassmalog.rubyforge.org/), the Ruby static blog engine I was using, although other Ruby static site generators seemed to have won more popularity. As a rubyist, probably all of the ruby static site generators are much easier for me to configure/program. Learning to use arrows in hakyll has been a challenge for my brain.
 
 Hakyll is actually a static site generator, but you can download a tutorial that has a full blog setup. I really like how the preview seems to just work while making changes, although things might slow down when I accumulate a lot of posts.
 
@@ -31,11 +31,11 @@ Rendering _site/posts/2010-09-30-first-post.html
 Rendering _site/rss.xml
 ~~~
 
-One nice aspect is integration with pandoc. I am already using the pandoc extended markdown features.
+One nice aspect is integration with [pandoc](http://johnmacfarlane.net/pandoc/README.html). I am already using the pandoc extended markdown features.
 
 Using Hamlet
 ------------
-One thing that helped with the decision for hakyll was hamlet support. I didn't see any explicit documentation for this feature. It turns out you just need to change the file names given to `renderChain`, so `index.html` will now be `index.html.hamlet`. To generate hamlet from the given blog html I used the ruby haml toolset (requires a ruby installation and `gem install haml hpricot`). Here is my shell converter (a little zsh specific). It get things most of the way there- then I just had to fix the doctype. My shell fu is not that good. I wish I had spent the time towards creating a real html2hamlet converter- I don't see why it would be that hard using something like TagSoup.
+One thing that helped with the decision for hakyll was hamlet support. You just need to change the file names given to `renderChain`, so `index.html` will now be `index.html.hamlet`. To generate hamlet from the given blog html I used the ruby haml toolset (requires a ruby installation and `gem install haml hpricot`). Here is my shell converter (a little zsh specific). It get things most of the way there- then I just had to fix the doctype. My shell fu is not that good. I wish I had spent the time towards creating a real html2hamlet converter- I don't see why it would be that hard using something like TagSoup.
 
     for f (*.html templates/*.html) html2haml --no-erb  $f | sed 's/\($[a-zA-Z]\+\)/\1$/g' | sed 's/ => /=/g' | sed 's/, :/!/g' | sed 's/", "/"!"/' | sed 's/{:\(.*\)}/!\1/g' | sed 's/"\/$/"/'  >| $f.hamlet
 
@@ -55,6 +55,7 @@ My biggest complaint right now is that there isn't a simple way to render templa
           let sidebar = renderAndConcat ["sidebar.html.hamlet"] [list]
           createCustomPage "dummy" [("sidebar", Right sidebar)]
 
-My config file is dangerously close to violating Hakyll philosophy of being < 100 lines.
+My config file is dangerously close to violating Hakyll philosophy that a site configuration should be < 100 lines.
 I could envision haskellers writing their blogs and other simple sites in Hakyll and sharing their configuraiton file settings, much like in Xmonad.
 Something like the Xmonad.Contrib could keep configuration file sizes down in size.
+But I think hakyll is a little difficult to approach for those new to arrows like me, so I doubt it will ever gain a large user base.

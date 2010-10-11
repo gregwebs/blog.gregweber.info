@@ -1,4 +1,6 @@
-%li
+%h1
   %a!href="$root$/$url$" $title$
-  \-
-  %em $date$
+%strong $date$
+%div Tagged as: $tags$.
+  $body$
+  %a!href="$root$/$url$#disqus_thread" View Comments

@@ -1,8 +1,6 @@
 #posts
-  %h1 Recent posts
-  %ul
-    $body$
+  $body$
+  %hr
   %a!href="$root$/posts" All posts...
   %div
     $tagcloud$
-.about

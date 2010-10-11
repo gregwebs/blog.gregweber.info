@@ -1,4 +1,3 @@
--- uploading -- can I add a command to hakyll for ./hakyll upload ?
 -- cd _site && rsync -av --delete./  www-data@gregweber.info:/var/www/blog.gregweber.info/
 module Main where
 
@@ -27,44 +26,45 @@ myConfig :: HakyllConfiguration
 myConfig = (defaultHakyllConfiguration "http://blog.gregweber.info")
     { enableNoHtmlUrl = True }
 
+t template = "templates/" ++ template ++ ".html.hamlet"
+
 main = hakyllWithConfiguration myConfig $ do
     directory css "css" -- Static directory.
-
     postPaths <- liftM (reverse . sort) $ getRecursiveContents "posts"
-    let renderablePosts = map ((>>> postManipulation) . createPage) postPaths
 
-    let renderSite template = renderChain (template:["templates/default.html.hamlet"]) . withSidebar
+    -- every page renders through here
+    -- put the "default" template at the base of render chain and add the sidebar
+    let renderSite template = renderChain (template:[t "default"]) . withSidebar
         withSidebar = flip combine $ do
-          let list = createPostListing "dummy" (take 3 renderablePosts) [("title", Left "Recent Posts")]
-          let sidebar = renderAndConcat ["sidebar.html.hamlet"] [list]
+          let sidebarPosts = map ((>>> postSidebar) . createPage) postPaths
+              list = createPostListing "dummy" (take 3 sidebarPosts) [("title", Left "Recent Posts")]
+              sidebar = renderAndConcat [t "sidebar"] [list]
           createCustomPage "dummy" [("sidebar", Right sidebar), ("blogTitle", Left blogTitle)]
 
-        renderPostList url title posts = do -- TODO: paginate
+    let renderablePosts = map ((>>> postManipulation) . createPage) postPaths
+        renderPostList url title posts = do
           let list = createPostListing url posts [("title", Left title)]
-          renderSite "posts.html.hamlet" list
+          renderSite (t "posts") list
+    -- render each post and /posts
+    forM_ renderablePosts $ renderSite (t "post")
+    renderPostList "posts.html" "All posts" renderablePosts
 
     let tagMap = readTagMap "postTags" postPaths
-
-    -- Render all posts
-    renderPostList "posts.html" "All posts" renderablePosts
-    
-    -- Render post list per tag
-    let renderListForTag tag posts =
+        -- render tags/tag for each tag
+        renderListForTag tag posts =
             renderPostList (tagToUrl tag) ("Posts tagged " ++ tag)
                            (map (>>> postManipulation) posts)
     withTagMap tagMap renderListForTag
 
-    -- Render index, including recent posts.
+    -- render index with post listing and tag cloud
     let tagCloud = tagMap >>> renderTagCloud tagToUrl 100 200
-        index = createPostListing "index.html"
+        index = createListing "index.html" 
+                              [t "post-preview"]
                               (take 3 renderablePosts)
                               [ ("title", Left "Home")
                               , ("tagcloud", Right tagCloud)
                               ]
-    renderSite "index.html.hamlet" index
-
-    -- Render each post.
-    forM_ renderablePosts $ renderSite "templates/post.html.hamlet"
+    renderSite (t "index") index
 
     -- rss feed for all posts and tagged posts
     renderFeeds "all" (take 3 renderablePosts)
@@ -72,13 +72,14 @@ main = hakyllWithConfiguration myConfig $ do
       when (tag `elem` ["haskell"]) $ renderFeeds tag (take 3 posts)
 
   where
+    postSidebar = renderDate "date" "%b %e" "Date unknown"
     postManipulation =   renderDate "date" "%B %e, %Y" "Date unknown"
                      >>> renderTagLinks tagToUrl 
 
     tagToUrl tag = "$root/tags/" ++ removeSpaces tag ++ ".html"
 
     createPostListing url posts values =
-        createListing url ["templates/postitem.html.hamlet"] posts values
+        createListing url [t "post-item"] posts values
 
     renderFeeds tag posts = do
       renderRss  (feedConfiguration "rss" tag) $ map postWithDescription posts
@@ -93,4 +94,4 @@ main = hakyllWithConfiguration myConfig $ do
         , feedAuthorName  = blogAuthor
         }
 
-    capitalize (c:cs) = (toUpper c):cs
+capitalize (c:cs) = (toUpper c):cs
