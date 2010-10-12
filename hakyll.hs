@@ -31,7 +31,7 @@ main = hakyllWithConfiguration myConfig $ do
 
     postPaths <- liftM (reverse . sort) $ getRecursiveContents "posts"
 
-    -- every page must renders through here - ensures default template & sidebar
+    -- every page must render through here - ensures default template & sidebar
     let renderSite template = renderChain (template:[t "default"]) . withSidebar
         withSidebar = flip combine $ do
           let sidebarPosts = map ((>>> postSidebar) . createPage) postPaths

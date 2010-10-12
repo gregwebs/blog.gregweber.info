@@ -28,6 +28,10 @@ body {
   padding: 1.6em 0 0 0;
   color: #333;
 }
+h1 a {
+  background-color: #8DBD82;
+  color: #333;
+}
 h1, h2, h3, h4, h5, h6 {
   color: #444;
 }
@@ -37,7 +41,7 @@ h1 {
   font-size: 3em;
   line-height: 1.0em;
   letter-spacing: -0.1ex;
-	margin: 5px;
+  margin: 5px;
 }
 li {
   padding: 0;
@@ -46,7 +50,7 @@ li {
 }
 a {
   color: #5E5AFF;
-  background-color: #A1DDB1;
+  background-color: #AD7;
   font-weight: normal;
   text-decoration: underline;
 }
@@ -86,13 +90,12 @@ td { padding: 2px 10px 2px 10px; }
 
 pre, code {
   font-family: monospace;
-  font-size: 90%;
+  font-size: 95%;
   line-height: 1.4em;
-  color: #ff8;
-  background-color: #111;
-  width: 40em;
-  padding: 2px 10px 2px 10px;
+  background-color: #9C9; /* #7A7; */
 }
+pre { padding: 5px; }
+/*
 .comment { color: #aaa; font-style: italic; }
 .keyword { color: #eff; font-weight: bold; }
 .punct { color: #eee; font-weight: bold; }
@@ -103,8 +106,7 @@ pre, code {
 .regex { color: #ec6; }
 .number { color: #F99; }
 .expr { color: #227; }
-
-.sidebar { float: right; }
+*/
 
 #version {
   width: 217px;
