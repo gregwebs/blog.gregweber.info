@@ -4,16 +4,15 @@
 $body$
 
 #disqus_thread
+
 %script!type="text/javascript"
   if( !window.location.toString().match(/localhost/) ){
-  (function() {
+  (function() { var disqus_identifier = '$url$';
   var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-  var disqus_identifier = '$title$'; /* [Optional but recommended: Define a unique identifier (e.g. post id or slug) for this thread] */
   dsq.src = 'http://gregweberblog.disqus.com/embed.js';
   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();
   }
-  %noscript Please enable JavaScript to view the
-    %a!href="http://disqus.com/?ref_noscript=gregweberblog" comments powered by Disqus
-  %a.dsq-brlink!href="http://disqus.com" blog comments powered by
-    span.logo-disqus Disqus
+
+%noscript
+  Please enable JavaScript to view the comments powered by Disqus or use this url: http://disqus.com/?ref_noscript=gregweberblog 

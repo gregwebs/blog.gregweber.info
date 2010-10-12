@@ -53,7 +53,7 @@ My biggest complaint right now is that there isn't a simple way to render templa
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.haskell}
 let withSidebar = flip combine $ do
   let list = createPostListing "dummy" (take 3 renderablePosts) [("title", Left "Recent Posts")]
-      sidebar = renderAndConcat ["templages/sidebar.html.hamlet"] [list]
+      sidebar = renderAndConcat ["templates/sidebar.html.hamlet"] [list]
   createCustomPage "dummy" [("sidebar", Right sidebar)]
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
@@ -69,7 +69,7 @@ templateToString template substitutions = pageToString template $
 This gives a decent alist interface to rendering a template.
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.haskell}
-let sidebar = templateToString "templages/sidebar.html.hamlet" [
+let sidebar = templateToString "templates/sidebar.html.hamlet" [
                   ("recentPosts", recentPosts)
                 , ("menu", menu)
                 ]

@@ -8,6 +8,8 @@ import Text.Hakyll.Feed (FeedConfiguration (..), renderRss, renderAtom)
 import Text.Hakyll.File (getRecursiveContents, directory, removeSpaces)
 import Text.Hakyll.CreateContext (createPage, createCustomPage, createListing)
 import Text.Hakyll.ContextManipulations (renderDate, copyValue)
+import Text.Hamlet (HamletSettings(..))
+
 
 import Data.List (sort)
 import Data.Map (toList)
@@ -20,8 +22,12 @@ blogTitle = "Greg Weber's Programming Blog"
 blogAuthor = "Greg Weber"
 
 myConfig :: HakyllConfiguration
-myConfig = (defaultHakyllConfiguration "http://blog.gregweber.info")
-    { enableNoHtmlUrl = True } -- gregwebs fork of Hakyll (for now)
+myConfig = (defaultHakyllConfiguration "http://blog.gregweber.info") {
+    enableNoHtmlUrl = True  -- gregwebs fork of Hakyll (for now)
+  , hamletSettings = HamletSettings { hamletCloseEmpties = True, hamletCloseNewline = True
+    , hamletDoctype = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+    }
+  }
 
 t template = "templates/" ++ template ++ ".html.hamlet"
 
@@ -35,12 +41,10 @@ main = hakyllWithConfiguration myConfig $ do
     let renderSite template = renderChain (template:[t "default"]) . withSidebar
         withSidebar = flip combine $ do
           let sidebarPosts = map ((>>> postSidebar) . createPage) postPaths
-              list = createPostListing "dummy" (take 3 sidebarPosts) []
-              recentPosts = pageToString (t "recent-posts") list
-              menu = templateToString (t "menu") []
+              listPage = createPostListing "dummy" (take 3 sidebarPosts) []
               sidebar = templateToString (t "sidebar") [
-                  ("recentPosts", recentPosts)
-                , ("menu", menu)
+                  ("recentPosts", pageToString (t "recent-posts") listPage)
+                , ("menu", templateToString (t "menu") [])
                 ]
           createCustomPage "dummy" [("sidebar", Right sidebar), ("blogTitle", Left blogTitle)]
 
