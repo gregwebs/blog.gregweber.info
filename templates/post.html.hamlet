@@ -8,7 +8,7 @@ $body$
   if( !window.location.toString().match(/localhost/) ){
   (function() {
   var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-  var disqus_identifier; // [Optional but recommended: Define a unique identifier (e.g. post id or slug) for this thread] */
+  var disqus_identifier = '$title$'; /* [Optional but recommended: Define a unique identifier (e.g. post id or slug) for this thread] */
   dsq.src = 'http://gregweberblog.disqus.com/embed.js';
   (document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
   })();

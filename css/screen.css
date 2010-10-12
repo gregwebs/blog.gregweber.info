@@ -1,4 +1,4 @@
-#page #content { float:left;margin-left: 10px; max-width: 800px; }
+#page #content { float:left;margin-left: 10px; min-width: 400px; max-width: 800px; }
 .blog-title { font-size: 4em; text-align: center; }
 #page #sidebar {float:left; padding-left:20px; min-width:100px; max-width:400px; min-height:500px; }
 #footer {clear:both;padding-top :30px;}
