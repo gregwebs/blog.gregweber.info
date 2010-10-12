@@ -4,7 +4,9 @@
     %meta!content="text/html; charset=UTF-8"!"http-equiv"="Content-Type"
     %title $blogTitle$ - $title$
     %link!href="$root$/css/screen.css"!rel="stylesheet"!type="text/css"
-    %link!href="http://example.com/rss.xml"!rel="alternate"!title="SimpleBlog"!type="application/rss+xml"
+    %link!href="/rss/all.xml"!rel="alternate"!title="$blogTitle$"!type="application/rss+xml"
+    %link!href="/atom/all.atom"!rel="alternate"!title="$blogTitle$"!type="application/atom+xml"
+
     %script!type="text/javascript"
       if( !window.location.toString().match(/localhost/) ){
       var _gaq = _gaq || [];

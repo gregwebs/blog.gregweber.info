@@ -1,4 +1,2 @@
-%h3
-  $title$
-%ul
-  $body$
+$recentPosts$
+$menu$

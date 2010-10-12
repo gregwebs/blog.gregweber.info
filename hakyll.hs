@@ -1,8 +1,4 @@
--- cd _site && rsync -av --delete./  www-data@gregweber.info:/var/www/blog.gregweber.info/
 module Main where
-
-import Control.Arrow ((>>>))
-import Control.Monad (when)
 
 import Text.Hakyll
 import Text.Hakyll.HakyllMonad
@@ -15,7 +11,8 @@ import Text.Hakyll.ContextManipulations (renderDate, copyValue)
 
 import Data.List (sort)
 import Data.Map (toList)
-import Control.Monad (forM_, liftM)
+import Control.Monad (when, forM_, liftM)
+import Control.Arrow ((>>>))
 import Data.Either (Either(..))
 import Data.Char (toUpper)
 
@@ -24,21 +21,27 @@ blogAuthor = "Greg Weber"
 
 myConfig :: HakyllConfiguration
 myConfig = (defaultHakyllConfiguration "http://blog.gregweber.info")
-    { enableNoHtmlUrl = True }
+    { enableNoHtmlUrl = True } -- gregwebs fork of Hakyll (for now)
 
 t template = "templates/" ++ template ++ ".html.hamlet"
 
 main = hakyllWithConfiguration myConfig $ do
-    directory css "css" -- Static directory.
+    directory css "css"
+    directory static "images"
+
     postPaths <- liftM (reverse . sort) $ getRecursiveContents "posts"
 
-    -- every page renders through here
-    -- put the "default" template at the base of render chain and add the sidebar
+    -- every page must renders through here - ensures default template & sidebar
     let renderSite template = renderChain (template:[t "default"]) . withSidebar
         withSidebar = flip combine $ do
           let sidebarPosts = map ((>>> postSidebar) . createPage) postPaths
-              list = createPostListing "dummy" (take 3 sidebarPosts) [("title", Left "Recent Posts")]
-              sidebar = renderAndConcat [t "sidebar"] [list]
+              list = createPostListing "dummy" (take 3 sidebarPosts) []
+              recentPosts = pageToString (t "recent-posts") list
+              menu = templateToString (t "menu") []
+              sidebar = templateToString (t "sidebar") [
+                  ("recentPosts", recentPosts)
+                , ("menu", menu)
+                ]
           createCustomPage "dummy" [("sidebar", Right sidebar), ("blogTitle", Left blogTitle)]
 
     let renderablePosts = map ((>>> postManipulation) . createPage) postPaths
@@ -72,6 +75,11 @@ main = hakyllWithConfiguration myConfig $ do
       when (tag `elem` ["haskell"]) $ renderFeeds tag (take 3 posts)
 
   where
+    pageToString template page = renderAndConcat [template] [page]
+    -- render a template with custom data instead of page data
+    templateToString template substitutions = pageToString template $
+      createCustomPage "dummy" $ map (\(a,b) -> (a, Right b)) $ substitutions
+
     postSidebar = renderDate "date" "%b %e" "Date unknown"
     postManipulation =   renderDate "date" "%B %e, %Y" "Date unknown"
                      >>> renderTagLinks tagToUrl 
@@ -88,7 +96,7 @@ main = hakyllWithConfiguration myConfig $ do
     postWithDescription = (>>> copyValue "body" "description")
 
     feedConfiguration format tag = FeedConfiguration
-        { feedUrl         = tag ++ "." ++ format
+        { feedUrl         = format ++ "/" ++ tag ++ "." ++ "xml"
         , feedTitle       = (capitalize tag) ++ " Posts"
         , feedDescription = (capitalize tag) ++ " posts from " ++ blogTitle
         , feedAuthorName  = blogAuthor

@@ -1,0 +1,8 @@
+%hr.subscribe
+Subscribe
+%a.feed!href="/rss/all.xml"
+  RSS
+  %img!src="/images/feed-icon-14x14.png"
+%a.feed!href="/atom/all.xml"
+  ATOM
+  %img!src="/images/feed-icon-14x14.png"
