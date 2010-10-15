@@ -1,7 +1,7 @@
 !!!
-%html!lang="en"!"xml:lang"="en"!xmlns="http://www.w3.org/1999/xhtml"
+%html!lang="en"!xml:lang="en"!xmlns="http://www.w3.org/1999/xhtml"
   %head
-    %meta!content="text/html; charset=UTF-8"!"http-equiv"="Content-Type"
+    %meta!content="text/html; charset=UTF-8"!http-equiv="Content-Type"
     %title $blogTitle$ - $title$
     %link!href="/css/screen.css"!rel="stylesheet"!type="text/css"
     %link!href="/css/syntax.css"!rel="stylesheet"!type="text/css"
