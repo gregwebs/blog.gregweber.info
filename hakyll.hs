@@ -24,7 +24,8 @@ blogAuthor = "Greg Weber"
 myConfig :: HakyllConfiguration
 myConfig = (defaultHakyllConfiguration "http://blog.gregweber.info") {
     enableNoHtmlUrl = True  -- gregwebs fork of Hakyll (for now)
-  , hamletSettings = HamletSettings { hamletCloseEmpties = True, hamletCloseNewline = True
+  , hamletSettings = HamletSettings { hamletCloseEmpties = True
+    , hamletCloseNewline = True
     , hamletDoctype = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
     }
   }

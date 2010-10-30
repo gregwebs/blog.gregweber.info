@@ -1,0 +1,20 @@
+name:            blog.gregweber.info
+version:         0.1
+license:         BSD3
+author:          Greg Weber <greg@gregweber.info>
+maintainer:      Greg Weber <greg@gregweber.info>
+synopsis:        Greg Weber's Programming blog
+description:     Greg Weber's Programming blog
+
+stability:       Stable
+cabal-version:   >= 1.6 
+build-type:      Simple
+homepage:        http://blog.gregweber.info
+
+library
+    build-depends:  hakyll
+    ghc-options:     -Wall
+
+source-repository head
+  type:     git 
+  location: http://github.com/gregwebs/blog.gregweber.info
