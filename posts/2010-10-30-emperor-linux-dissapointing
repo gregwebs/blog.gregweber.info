@@ -1,0 +1,21 @@
+title: Happy with Thinkpad, Dissapointed by EmperorLinux
+description: Bought a new computer through Emperor Linux- it wasn't worth it.
+tags: computer,ergonomics,work environment
+---
+
+I just bought a [Lenovo X201 Tablet](shop.lenovo.com/us/landing.../thinkpad/.../X201-X201s-X201tablet). I can't recommend this computer highly enough- for the first time in my life I am happy with the computer I am using and the software it is running.
+
+I free-lance program from home, and when the weather is good I do a majority of programming outside. The main motivating factor for my purchase was to get a computer with an outdoor screen. I also wanted a tablet computer to write on. As a programmer I type all day, but when taking notes or making lists I much prefer writing by hand. Tablets are also really nice for when you need to sign a document- it eliminates the print and scan step. I wanted to buy a Linux laptop that would work well out of the box or be easy to get working well- this alone severely limits what computers are available. Combining these desireds led me to the Thinkpad tablet with an outdoor screen. Thinkpads are known as high-quality computers that run Linux well.
+
+As a free-lancer I understand the concept that time is money. I didn't want to be spending hours trying to get my computer functioning properly. So I decided to buy my computer through [EmperorLinux](emperorlinux.com). They charge a hefty fee, but if it means I spend near-zero amount of time administrating my computer it could actually save me money. Sort of ironic that for the privelege of using free software I paid a lot money.
+
+Mac users might rightfully laugh at me now, but my previous computer was a Mac. I did love the fact that the hardware just works. But ultimately OS X is limiting and can end up being even more time-consuming. My reasons for preferring Linux over OS X
+* Autocopy - I use this every day, all the time, makes life a little better.
+* choice of window managers- I am using [xmonad](xmonad.org), which is a tiling, keyboard based window manager which allows for much more effecient workflows.
+* easy to install libraries - on Ubuntu I have been able to easily install libraries for programming and software for personal or professional needs. Installing libraries on Mac could be exteremly painful. There are just so many more packages available in the Debian system that are more up to date.
+* choice of hardware - Mac offers me a guarantee that the hardware will work easily and perfectly, but it won't allow me to use the hardware I want (outdoor screen).
+
+
+
+
+As a programmer I spend half my waking hours in front of a computer- half of my waking hours are better now. 
