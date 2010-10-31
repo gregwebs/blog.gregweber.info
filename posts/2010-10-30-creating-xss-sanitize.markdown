@@ -28,7 +28,7 @@ Parsing HTML in Haskell
 ----------------------
 * Text.XML.HaXml.Html.Parsec (htmlParse)
 * the parser from pandoc
-* libxml2 at least for parsing - this parses "real world" html
+* libxml2 html parser
 * Text.XML.HXT.Parser.TagSoup (parseHtmlTagSoup)
 * TagSoup parseTags/renderTags 
 
