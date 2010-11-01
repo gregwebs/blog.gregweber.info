@@ -6,6 +6,7 @@ tags: haskell
 
 Putting together a Haskell library for XSS sanitization
 =======================================================
+
 Motivation
 ----------
 I want a productive platform for developing web applications. Why Haskell? One of the primary reasons is type safety. Type safety in an individual function is great. But what is impressive is building upon that to provide higher-level guarantees. The [Yesod web framework](http://docs.yesodweb.com) can make guarantees that URLs exist and that database queries are valid among other things. But what is very important for web application developers is making security guarantees. For example, using Yesod's persistent library guarantees that SQL injection can't occur. For Haskell to provide an attractive web application platform, we need to make as many security guarantees as we can at compile time. It is disappointing to me to build something with a "safe" language if the end result is still going to be something insecure. I saw a gaping security hole- user supplied html content, and set out to banish it.
@@ -29,14 +30,14 @@ Parsing HTML in Haskell
 * Text.XML.HaXml.Html.Parsec (htmlParse)
 * the parser from pandoc
 * libxml2 html parser
-* Text.XML.HXT.Parser.TagSoup (parseHtmlTagSoup)
+* Text.XML.HXT - ReadDocument using the options withParseHTML or withTagSoup
 * TagSoup parseTags/renderTags 
 
 The foundation of parsing in Haskell is usually Parsec. John Macfarlane, the author of Pandoc, tole me that he wrote his own Parsec parser because at the time he looked at it Text.XML.HaXml.Html.Parsec wasn't flexible enough for real world html. The Pandoc parser is theoretically a good html parser, but isn't broken out into a separate package.
 
 Of course, we can always bind to C libraries. The C library of choice seems to be [libxml2](http://xmlsoft.org/html/libxml-HTMLparser.html), which can quickly parse html into a manipulatable document. [Nokogiri](http://nokogiri.org/) is a library for ethe Ruby language which binds to libxml2 and allows HTML to easily be manipulated with css selectors or xpath. However, Haskell's multiple libxml2 bindings are low-level and incomplete.
 
-TagSoup is a pure Haskell HTML parser. It has some limitations- parsing and re-rendering will produce a semantically equivalent result, but there are some limitations with quoting and self-closing tags. TagSoup also doesn't build up a document structure. However, there is Text.XML.HXT.Parser.TagSoup to build up a document structure.
+TagSoup is a pure Haskell HTML parser. It has some limitations- parsing and re-rendering will produce a semantically equivalent result, but there are some limitations with quoting and self-closing tags. TagSoup also doesn't build up a document structure. However, there is Text.XML.HXT.Parser.TagSoup to build up a document structure. HXT also comes with an html parser of its own.
 
 It would be great if Haskell could come up with a complete html manipulation solution- one that allows easy html manipulation without any limitations. This would probably come from the form of complete libxml2 bindings with a high-level interface or from improvements to TagSoup to remove its limitations.
 
