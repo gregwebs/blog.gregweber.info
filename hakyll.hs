@@ -39,6 +39,8 @@ main = hakyllWithConfiguration myConfig $ do
     postPaths <- liftM (reverse . sort) $ getRecursiveContents "posts"
 
     -- every page must render through here - ensures default template & sidebar
+    -- TODO: hakyll 2.4 (and my fork of it) added an addField function
+    --   that may get rid of the need for rendering helpers
     let renderSite template = renderChain (template:[t "default"]) . withSidebar
         withSidebar = flip combine $ do
           let sidebarPosts = map ((>>> postSidebar) . createPage) postPaths
