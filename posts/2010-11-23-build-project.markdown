@@ -7,7 +7,7 @@ tags: haskell,linux
 
 I wanted my [Yesod](http://docs.yesodweb.com) application to automatically respond appropriately to file changes. The code needs to be rebuild. I am using [coffescript](http://jashkenas.github.com/coffee-script/) which needs to be converted to JavaScript, I want tests to be automatically run. These kinds of things help keep me in flow instead of worrying about the state of my application.
 
-I am still figuring out how to accomplish this in Haskell. One problem seems to be- how can a child process be properly controlled- started, run, and restarted? ork + exec is the only think I could get working without having to deal with "zombie processes"
+I am still figuring out how to accomplish this in Haskell. One problem seems to be- how can a child process be properly controlled- started, run, and restarted? fork + exec is the only think I could get working without having to deal with "zombie processes"
 
 ~~~~~~~~~~~~~~~~~~~~ {.haskell}
   run cmd args = executeFile cmd True args Nothing
