@@ -29,7 +29,7 @@ I am still figuring out how to accomplish this in Haskell. One problem seems to 
 
 This seems to be working well enough. But it is limited- there isn't a direct way to execute a shell command made of multiple commands like: `cabal build && ./run`
 
-I am using the [hinotify](http://haskell.org/~kolmodin/code/hinotify/README.html) library, and I think I finally have that figured out. It works best when I watch directories, not files and filter the incoming modification events to restrict them to certain files (by file extension). One big thing to remember is that watching a directory does not watch its subdirectories.
+I am using the [hinotify](http://hackage.haskell.org/package/hinotify) library, and I think I finally have that figured out. It works best when I watch directories, not files and filter the incoming modification events to restrict them to certain files (by file extension). One big thing to remember is that watching a directory does not watch its subdirectories.
 
 I kick the watcher off with this command that gives it the directories to watch- this shows off why I use Z Shell. It is easy to remove things from a star glob with `~` (the dist directory in this case) and to restrict a glob to only directories with `(/)`
 
