@@ -30,6 +30,8 @@ I love the thinkpad keyboard! So much that I bought an [external thinkpad keyboa
 EmperorLinux
 ============
 
+EmperorLinux provides the full Linux experience, including the support experience you would get from a Linux admin.
+
 When first using my computer I was very happy that I purchased through EmperorLinux. Everything worked well out of the box. The first problem that I noticed was they had a shortcut to the Jarnal program (a journal for tablets) that didn't work. Not a big problem- it just wasn't installed- I was able to easily download and install the jarnal program. The next issues were that the video did not work, and that suspend/hibernate weren't working properly. After sending my first support request to get video working I got no response until I asked again a week later. The pattern is repeating itself for the suspend issue. And even though they may fix the issue, I will have ended up wasting hours of my time on this- the exact thing I was supposed to be avoiding. As a programmer I cannot fathom that their install was missing 2 components- its the year 2010 and a company isn't running a script that automatically verifies that software components at least exist? It would be somewhate understandable if the software existed but wasn't working properly.
 
 
