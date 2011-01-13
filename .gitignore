@@ -1,5 +1,6 @@
 _cache/
 _site/
+new-posts
 
 hakyll
 *.hi
