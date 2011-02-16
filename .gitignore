@@ -1,7 +1,7 @@
 _cache/
 _site/
+dist/
 new-posts
 
-hakyll
 *.hi
 *.o

@@ -1,4 +1,4 @@
-name:            blog.gregweber.info
+name:            gregweber
 version:         0.1
 license:         BSD3
 author:          Greg Weber <greg@gregweber.info>
@@ -11,9 +11,12 @@ cabal-version:   >= 1.6
 build-type:      Simple
 homepage:        http://blog.gregweber.info
 
-library
-    build-depends:  hakyll
-    ghc-options:     -Wall
+executable hakyll
+  Main-is: hakyll.hs
+  build-depends:   base
+                 , containers
+                 , hakyll
+                 , hamlet < 0.7
 
 source-repository head
   type:     git 
