@@ -1,6 +1,6 @@
-#posts
-  $body$
-  %hr
-  %a!href="$root$/posts" All posts...
-  %div
-    $tagcloud$
+<div id="posts">
+  #{body}
+  <hr>
+  <a href="#{root}/posts">All posts...
+  <div>
+    #{tagcloud}

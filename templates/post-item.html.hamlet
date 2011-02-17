@@ -1,4 +1,4 @@
-%li
-  %a!href="$root$/$url$" $title$
-  \-
-  %em $date$
+<li>
+  <a href="#{root}/#{url}">#{title}
+  -
+  <em>#{date}

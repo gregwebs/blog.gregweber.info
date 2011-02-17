@@ -1,40 +1,38 @@
-!!!
-%html!lang="en"!xml:lang="en"!xmlns="http://www.w3.org/1999/xhtml"
-  %head
-    %meta!content="text/html; charset=UTF-8"!http-equiv="Content-Type"
-    %title $blogTitle$ - $title$
-    %link!href="/css/screen.css"!rel="stylesheet"!type="text/css"
-    %link!href="/css/syntax.css"!rel="stylesheet"!type="text/css"
-    %link!href="/rss/all.xml"!rel="alternate"!title="$blogTitle$"!type="application/rss+xml"
-    %link!href="/atom/all.atom"!rel="alternate"!title="$blogTitle$"!type="application/atom+xml"
-
-    %script!type="text/javascript"
-      if( !window.location.toString().match(/localhost/) ){
-      var _gaq = _gaq || [];
-      _gaq.push(['_setAccount', 'UA-18844444-1']);
-      _gaq.push(['_setDomainName', 'blog.gregweber.info']);
-      _gaq.push(['_trackPageview']);
-      (function() {
-      var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
-      ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
-      var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
-      })();
-      }
-
-  %body
-    #wrap
-      %h1.blog-title $blogTitle$
-      #navigation
-        %a!href="$root$/" Home
-        %a!href="$root$/posts" All posts
-      #page
-        #content
-          $body$
-        #sidebar
-          $sidebar$
-      #footer
-        %hr
-        by Greg Weber
-        %span.credit
+\<!DOCTYPE html>
+\
+<html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
+  <head>
+    <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
+    <title>#{blogTitle} - #{title}
+    <link href="/css/screen.css" rel="stylesheet" type="text/css">
+    <link href="/css/syntax.css" rel="stylesheet" type="text/css">
+    <link href="/rss/all.xml" rel="alternate" title="#{blogTitle}" type="application/rss+xml">
+    <link href="/atom/all.atom" rel="alternate" title="#{blogTitle}" type="application/atom+xml">
+    <script type="text/javascript">
+      \if( !window.location.toString().match(/localhost/) ){
+      \var _gaq = _gaq || [];
+      \_gaq.push(['_setAccount', 'UA-18844444-1']);
+      \_gaq.push(['_setDomainName', 'blog.gregweber.info']);
+      \_gaq.push(['_trackPageview']);
+      \(function() {
+      \var ga = document.createElement('script'); ga.type = 'text/javascript'; ga.async = true;
+      \ga.src = ('https:' == document.location.protocol ? 'https://ssl' : 'http://www') + '.google-analytics.com/ga.js';
+      \var s = document.getElementsByTagName('script')[0]; s.parentNode.insertBefore(ga, s);
+      \})();
+      \}
+  <body>
+    <div id="wrap">
+      <h1 .blog-title>#{blogTitle}
+      <div id="navigation">
+        <a href="#{root}/">Home
+        <a href="#{root}/posts">All posts
+      <div id="page">
+        <div id="content">
+          #{body}
+        <div id="sidebar">
+          #{sidebar}
+      <div id="footer">
+        <hr> by Greg Weber
+        <span .credit>
           Theme extended from 
-          %a!href="http://newgem.rubyforge.org/" Dr. Nic
+          <a href="http://newgem.rubyforge.org/">Dr. Nic

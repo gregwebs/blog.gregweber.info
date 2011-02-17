@@ -1,6 +1,6 @@
-%h1
-  %a!href="$root$/$url$" $title$
-%strong $date$
-%div Tagged as: $tags$.
-  $body$
-  %a!href="$root$/$url$#disqus_thread" View Comments
+<h1>
+  <a href="#{root}/#{url}">#{title}
+<strong>#{date}
+<div>Tagged as: #{tags}.
+  #{body}
+  <a href="#{root}/#{url}#disqus_thread">View Comments
