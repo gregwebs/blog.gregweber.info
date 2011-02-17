@@ -16,7 +16,7 @@ executable hakyll
   build-depends:   base
                  , containers
                  , hakyll
-                 , hamlet < 0.7
+                 , hamlet == 0.7.*
 
 source-repository head
   type:     git 

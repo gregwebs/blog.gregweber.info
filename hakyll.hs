@@ -8,7 +8,7 @@ import Text.Hakyll.Feed (FeedConfiguration (..), renderRss, renderAtom)
 import Text.Hakyll.File (getRecursiveContents, directory, removeSpaces)
 import Text.Hakyll.CreateContext (createPage, createCustomPage, createListing)
 import Text.Hakyll.ContextManipulations (renderDate, copyValue)
-import Text.Hamlet (HamletSettings(..))
+import Text.Hamlet (HamletSettings(..), defaultHamletSettings)
 
 
 import Data.List (sort)
@@ -24,9 +24,8 @@ blogAuthor = "Greg Weber"
 myConfig :: HakyllConfiguration
 myConfig = (defaultHakyllConfiguration "http://blog.gregweber.info") {
     enableNoHtmlUrl = True  -- gregwebs fork of Hakyll (for now)
-  , hamletSettings = HamletSettings { hamletCloseEmpties = True
-    , hamletCloseNewline = True
-    , hamletDoctype = "<!DOCTYPE html PUBLIC \"-//W3C//DTD XHTML 1.0 Transitional//EN\" \"http://www.w3.org/TR/xhtml1/DTD/xhtml1-transitional.dtd\">"
+  , hamletSettings = defaultHamletSettings { -- hamletCloseEmpties = True
+      hamletCloseNewline = True
     }
   }
 
@@ -87,7 +86,7 @@ main = hakyllWithConfiguration myConfig $ do
     templateToString template substitutions = pageToString template $
       createCustomPage "dummy" $ map (\(a,b) -> (a, Right b)) $ substitutions
 
-    postSidebar = renderDate "date" "%b %e" "Date unknown"
+    postSidebar = renderDate "date" "%b" "Date unknown"
     postManipulation =   renderDate "date" "%B %e, %Y" "Date unknown"
                      >>> renderTagLinks tagToUrl 
 
