@@ -148,3 +148,7 @@ pre { padding: 5px; }
 	cursor:	pointer; 
 	cursor:	hand;
 }
+
+article,aside,details,figcaption,figure,footer,header,hgroup,menu,nav,section { 
+  display:block;
+}
