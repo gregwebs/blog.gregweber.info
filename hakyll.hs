@@ -87,7 +87,9 @@ main = hakyllWithConfiguration myConfig $ do
       createCustomPage "dummy" $ map (\(a,b) -> (a, Right b)) $ substitutions
 
     postSidebar = renderDate "date" "%b" "Date unknown"
+                  >>> renderDate "dateTime" "%F" ""
     postManipulation =   renderDate "date" "%B %e, %Y" "Date unknown"
+                     >>> renderDate "dateTime" "%F" ""
                      >>> renderTagLinks tagToUrl 
 
     tagToUrl tag = "$root/tags/" ++ removeSpaces tag ++ ".html"

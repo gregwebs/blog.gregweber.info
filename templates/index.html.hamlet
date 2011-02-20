@@ -1,6 +1,7 @@
 <div id="posts">
   #{body}
-  <hr>
+  <hr/>
   <a href="#{root}/posts">All posts...
+  <hr/>
   <div>
     #{tagcloud}

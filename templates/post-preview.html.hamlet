@@ -1,6 +1,9 @@
-<h1>
-  <a href="#{root}/#{url}">#{title}
-<strong>#{date}
-<div>Tagged as: #{tags}.
+<article>
+  <header>
+    <h1>
+      <a href="#{root}/#{url}">#{title}
+    <strong>
+      <time datetime=#{dateTime}>#{date}
+    <p>Tagged as: #{tags}.
   #{body}
   <a href="#{root}/#{url}#disqus_thread">View Comments

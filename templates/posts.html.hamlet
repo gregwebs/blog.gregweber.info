@@ -1,3 +1,4 @@
 <h2>#{title}
-<ul>
-  #{body}
+<nav>
+  <ul>
+    #{body}

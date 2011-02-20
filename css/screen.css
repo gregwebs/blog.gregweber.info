@@ -1,17 +1,17 @@
 #page #content { float:left;margin-left: 10px; min-width: 400px; max-width: 800px; }
 .blog-title { font-size: 4em; text-align: center; }
-#page #sidebar {float:left; padding-left:20px; min-width:100px; max-width:400px; min-height:500px; }
-#footer {clear:both;padding-top :30px;}
+#page aside {float:left; padding-left:20px; min-width:100px; max-width:400px; min-height:500px; }
+footer {clear:both;padding-top :30px;}
 .credit {padding-left:40px; font-size:10px; }
 a.feed { padding: 10px; margin: 10px; }
 a.feed img { margin-left:5px; }
 .subscribe { margin:30px; }
-#navigation {
+nav#top {
   padding-top: 20px;
-    text-align: center;
-    border-bottom: 4px solid grey;
+  text-align: center;
+  border-bottom: 4px solid grey;
 }
-#navigation a {
+nav#top a {
     color: white;
     text-decoration: none;
     background-color: grey;
@@ -147,20 +147,4 @@ pre { padding: 5px; }
 .clickable {
 	cursor:	pointer; 
 	cursor:	hand;
-}
-
-#twitter_search {
-	margin: 40px 0 10px 15px;
-  color: #F1F4FF;
-  background-color: #9A5535;
-  border: 3px solid #7E393E;
-}
-
-#twitter_search h3 {
-  color: #F1F4FF;
-	margin-bottom: 0px;
-}
-
-#twitter_search center b {
-	display: none;
 }

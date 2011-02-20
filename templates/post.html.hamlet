@@ -1,16 +1,19 @@
-<h1>#{title}
-<strong>#{date}
-<div>Tagged as: #{tags}.
-#{body}
+<article>
+  <header>
+    <h1>#{title}
+    <time datetime=#{dateTime} pubdate>
+      <strong>#{date}
+    <p>Tagged as: #{tags}.
+  #{body}
 
-<div#disqus_thread>
-<script type="text/javascript">
-  \if( !window.location.toString().match(/localhost/) ){
-  \(function() { var disqus_identifier = '#{url}';
-  \var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
-  \dsq.src = 'http://gregweberblog.disqus.com/embed.js';
-  \(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
-  \})();
-  \}
-<noscript>
-  Please enable JavaScript to view the comments powered by Disqus or use this url: http://disqus.com/?ref_noscript=gregweberblog 
+  <#disqus_thread>
+  <script type="text/javascript">
+    \if( !window.location.toString().match(/localhost/) ){
+    \(function() { var disqus_identifier = '#{url}';
+    \var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
+    \dsq.src = 'http://gregweberblog.disqus.com/embed.js';
+    \(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);
+    \})();
+    \}
+  <noscript>
+    Please enable JavaScript to view the comments powered by Disqus or use this url: http://disqus.com/?ref_noscript=gregweberblog 

@@ -8,6 +8,9 @@
     <link href="/css/syntax.css" rel="stylesheet" type="text/css">
     <link href="/rss/all.xml" rel="alternate" title="#{blogTitle}" type="application/rss+xml">
     <link href="/atom/all.atom" rel="alternate" title="#{blogTitle}" type="application/atom+xml">
+    <!--[if lt IE 9]>
+    <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
+    \<![endif]-->
     <script type="text/javascript">
       \if( !window.location.toString().match(/localhost/) ){
       \var _gaq = _gaq || [];
@@ -22,17 +25,20 @@
       \}
   <body>
     <div id="wrap">
-      <h1 .blog-title>#{blogTitle}
-      <div id="navigation">
+      <header>
+        <h1 .blog-title>#{blogTitle}
+      <nav#top>
         <a href="#{root}/">Home
         <a href="#{root}/posts">All posts
       <div id="page">
         <div id="content">
           #{body}
-        <div id="sidebar">
+        <aside>
           #{sidebar}
-      <div id="footer">
-        <hr> by Greg Weber
-        <span .credit>
-          Theme extended from 
-          <a href="http://newgem.rubyforge.org/">Dr. Nic
+      <footer>
+        <hr>
+        <p>
+          by Greg Weber
+          <span .credit>
+            Theme extended from 
+            <a href="http://newgem.rubyforge.org/">Dr. Nic

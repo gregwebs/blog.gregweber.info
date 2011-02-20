@@ -1,3 +1,4 @@
 <h3>Recent Posts
-<ul>
-  #{body}
+<nav>
+  <ul>
+    #{body}
