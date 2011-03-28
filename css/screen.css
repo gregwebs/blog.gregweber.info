@@ -29,7 +29,6 @@ body {
   color: #111;
 }
 h1 a {
-  background-color: #8DBD82;
   color: #333;
   line-height: 1.1em; 
 }
@@ -50,8 +49,7 @@ li {
   list-style-type: square;
 }
 a {
-  color: #5E5AFF;
-  background-color: #AD7;
+  color: #3E3AAA;
   font-weight: normal;
   text-decoration: underline;
 }
