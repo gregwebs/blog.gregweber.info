@@ -92,6 +92,7 @@ pre, code {
   font-size: 95%;
   line-height: 1.4em;
   background-color: #9C9; /* #7A7; */
+  font-weight: bold;
 }
 pre { padding: 5px; }
 /*
