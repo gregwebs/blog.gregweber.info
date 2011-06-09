@@ -4,6 +4,7 @@ description: Applying Fibers to make sax-machine scale
 tags: ruby,xml
 ---
 
+This is part 1 of a series. [Part 2](/posts/2011-06-08-high-performance-rb-part2) is on data storage.
 
 # Scalability is king when it comes to performance
 

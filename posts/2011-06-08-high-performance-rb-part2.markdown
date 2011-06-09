@@ -4,6 +4,7 @@ description: MongoDB is a fast and flexible alternative to SQL
 tags: ruby,mongodb
 ---
 
+This is part 2 of a series. [Part 1](/posts/2011-06-03-high-performance-rb-part1) was on fibers, enumerators and scalbale XML parsing.
 
 ## MongoDB is a better default data store for most web applications.
 
