@@ -36,7 +36,7 @@ For slow writes in SQL, there aren't many good answers. MongoDB was designed for
 
 On a previous project I needed to do lots of updates to some counters in MySQL. I ended up writing out the updates to a file and then doing a single update to the counter representing all the updates written to the file. Not a horrible solution, but it adds complexity and makes the data not real-time. In MongoDB you would just update the counters with an atomic increment or decrement operation and be done.
 
-I have also dealt with trying to fit schemaless data into MySQL, and found it to be an absolute nightmare. Many users are doing this in MySQL with blobs of data serialized to JSON or binary. However, they give up the ability to query this datain the database. The solutions that allow you to query schemaless data all perform poorly in MySQL. Again, in MongoDB it is a non-issue.
+I have also dealt with trying to fit schemaless data into MySQL, and found it to be an absolute nightmare. Many users are doing this in MySQL with blobs of data serialized to JSON or binary. However, they give up the ability to query this data in the database. The solutions that allow you to query schemaless data all perform poorly in MySQL. Again, in MongoDB it is a non-issue.
   
 I don't want to make MongoDB sound like a magic bullet. For the 2 use cases I just listed, it can be. However, for most read queries it is not likely to be noticeably faster than SQL, and many smaller sites don't care greatly about write speed. Again, I am just making the case for why it can be a better default.
 
