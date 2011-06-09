@@ -15,19 +15,31 @@ Most SQL databases trade off too much in terms of performance and features in or
   * relational tables
   * transactions
   
-  If you need transactions, then by all means keep using a SQL database, although if you are really focused on that (OLTP) there are probably better alternatives out there.
+If you need transactions, then by all means keep using a SQL database, although if you are really focused on that (OLTP) there are probably better alternatives out there.
   
-  Some aspects of relational tables don't scale well, and there are also better ways of modeling data.
+Some aspects of relational tables don't scale well, and there are also better ways of modeling data.
   
 ### The need for speed
 
-  One of the standard answers to slow reads in SQL is replication. MongoDB comes with good replication built in. Another answer in SQL is to cache with memcache. In MongoDB, the indexes are already in memory, so you can achieve great performance as long as you have enough memory. To increase memory, you can put separate collections on separate machines without worry because there are no joins. This can take you a longer way than MySQL before the need for more complex caching infrastructure. And you can start off your caching infrastructure with MongoDB itself because of its fast writes and reads and schemaless storage.
-
-  Generally when sites get very heavy traffic, they stop doing database joins and do them instead in the application. Perhaps your site will never reach that point, but if there are 2 equal alternatives, it only makes sense to use that one that scales.
+One of the standard answers to slow reads in SQL is replication. MongoDB comes with good replication built in. Another answer in SQL is to cache with memcache. In MongoDB, the indexes are in memory, so you can achieve good performance as long as you hit the indexes and have enough memory for them. To increase memory, you can put separate collections on separate machines without worry because there are no joins.
   
-  For slow writes in SQL, there aren't many good answers. MongoDB was designed for modern usage patterns, not to fit the relational SQL constraints- writes are *much* faster. As the author of _High Performance MySQL_ [stated](http://blog.mongodb.org/post/5545198613/mongodb-live-at-craigslist):
+The other approach to faster reads is caching. You can start off your caching infrastructure with MongoDB itself because of its fast writes and reads and schemaless storage.
+
+Generally when sites get very heavy traffic, they stop doing database joins and do them instead in the application. Perhaps your site will never reach that point, but if there are 2 equal alternatives, it only makes sense to use that one that scales.
+  
+For slow writes in SQL, there aren't many good answers. MongoDB was designed for modern usage patterns, not to fit the relational SQL constraints- writes are *much* faster. As the author of _High Performance MySQL_ [stated](http://blog.mongodb.org/post/5545198613/mongodb-live-at-craigslist):
 
     We can put data into MongoDB faster than we can get it out of MySQL during the migration.
+
+
+### Faster use cases
+
+On a previous project I needed to do lots of updates to some counters in MySQL. I ended up writing out the updates to a file and then doing a single update to the counter representing all the updates written to the file. Not a horrible solution, but it adds complexity and makes the data not real-time. In MongoDB you would just update the counters with an atomic increment or decrement operation and be done.
+
+I have also dealt with trying to fit schemaless data into MySQL, and found it to be an absolute nightmare. Many users are doing this in MySQL with blobs of data serialized to JSON or binary. However, they give up the ability to query this datain the database. The solutions that allow you to query schemaless data all perform poorly in MySQL. Again, in MongoDB it is a non-issue.
+  
+I don't want to make MongoDB sound like a magic bullet. For the 2 use cases I just listed, it can be. However, for most read queries it is not likely to be noticeably faster than SQL, and many smaller sites don't care greatly about write speed. Again, I am just making the case for why it can be a better default.
+
 
 ### Richer data modeling
 
