@@ -17,7 +17,7 @@ Scalability concerns can be different depending on the context. Often it means c
 
 A Fiber is a light-weight thread of execution that can be paused or resumed by the programmer. We might be comfortable handing off all of the task of pausing and resuming to a better runtime, particularly in the case of non-blocking IO. But it turns out this is not that hard to manage, and it only has to be done once by the library writer- the implementation details become transparent to the library user.
 
-By the end of this series you should be convinced of the importance of fibers. Unfortunately MRI 1.9 is still the king of fiber performance, but expect JRuby & Rubinius to catch-up. Note that there are alternative techniques for asynchronous IO in the jRuby runtime that I know little about.
+By the end of this series you should be convinced of the importance of fibers. Unfortunately MRI 1.9 is still the king of fiber performance, but expect JRuby & Rubinius to catch-up.
 
 # XML: Constant memory usage with enumerators and fibers
 

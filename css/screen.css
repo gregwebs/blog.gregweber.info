@@ -73,15 +73,22 @@ blockquote {
 }
 
 table {
+  padding: 30px;
+  /*
   font-size: 90%;
   line-height: 1.4em;
+  padding: 2px 10px 2px 10px;
   color: #ff8;
   background-color: #111;
-  padding: 2px 10px 2px 10px;
-	border-style: dashed;
+  border-style: dashed;
+  */
 }
-th { color: #fff; }
-td { padding: 2px 10px 2px 10px; }
+th { color: #fff;
+  padding: 0px 20px 0px 20px;
+}
+td {
+  padding: 0px 20px 0px 20px;
+}
 
 .success { color: #0CC52B; }
 .failed { color: #E90A1B; }

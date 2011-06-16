@@ -1,3 +1,2 @@
 #!/bin/sh
-echo "dist/build/hakyll/hakyll $@"
-cabal configure && cabal build && dist/build/hakyll/hakyll $@
+exec dist/build/hakyll/hakyll $@
