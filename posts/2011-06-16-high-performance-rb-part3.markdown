@@ -144,4 +144,4 @@ Obviously there are going to be more possibilities here. I will speak to what I 
 
 ## Conclusion
 
-Please stop using MRI 1.8 if you can help it. Use asynchronous drivers for your database and any other IO. And try out an asynchronous framework and help make it better. We need to make non-blocking IO the default, at which point Ruby applications will have a much easier time scaling. I know this isn't a magic bullet- you are still going to have to scale your database and make sure you don't blow up memory usage in your Ruby code. But it will translate to better performance, reduced memory consumption, and simpler deployments.
+Use MRI 1.9 on all new projects, and use asynchronous drivers for your database and any other IO. And try out an asynchronous framework and help make it better. We need to make non-blocking IO the default, at which point Ruby applications will have a much easier time scaling. I know this isn't a magic bullet- you are still going to have to scale your database and make sure you don't blow up memory usage in your Ruby code. But it will translate to better performance, reduced memory consumption, and simpler deployments.
