@@ -21,15 +21,20 @@ Some aspects of relational tables don't scale well, and there are also better wa
   
 ### The need for speed
 
-One of the standard answers to slow reads in SQL is replication. MongoDB comes with good replication built in. Another answer in SQL is to cache with memcache. In MongoDB, the indexes are in memory, so you can achieve good performance as long as you hit the indexes and have enough memory for them. To increase memory, you can put separate collections on separate machines without worry because there are no joins.
+One of the standard answers to slow reads in SQL is replication. MongoDB comes with good replication built in.
+
+Most databases will try to keep their indexes in memory, so you can achieve good performance as long as you hit the indexes and have enough memory for them. Because MongoDB has no joins it is easier to increase memory by simply putting separate collections on separate machines.
   
-The other approach to faster reads is caching. You can start off your caching infrastructure with MongoDB itself because of its fast writes and reads and schemaless storage.
+The other approach to faster reads is caching, perhaps with memcache. But if it is convenient, you can start off your caching infrastructure with MongoDB itself because of its fast writes and reads and schemaless storage.
 
 Generally when sites get very heavy traffic, they stop doing database joins and do them instead in the application. Perhaps your site will never reach that point, but if there are 2 equal alternatives, it only makes sense to use that one that scales.
   
-For slow writes in SQL, there aren't many good answers. MongoDB was designed for modern usage patterns, not to fit the relational SQL constraints- writes are *much* faster. As the author of _High Performance MySQL_ [stated](http://blog.mongodb.org/post/5545198613/mongodb-live-at-craigslist):
+For slow writes in SQL, there aren't many good answers. MongoDB was designed for modern usage patterns, not to fit the relational SQL constraints- writes are *much* faster. As the author of _High Performance MySQL_ [stated](http://blog.mongodb    .org/post/5545198613/mongodb-live-at-craigslist):
 
     We can put data into MongoDB faster than we can get it out of MySQL during the migration.
+
+
+Unfortunately MongoDB still has write locks that limit its capabilities. However, you can still take MongoDB much farther with writes than is possible in SQL databases, and there is potential for even more improvement in future versions of MongoDB. 
 
 
 ### Faster use cases
@@ -43,9 +48,11 @@ I don't want to make MongoDB sound like a magic bullet. For the 2 use cases I ju
 
 ### Richer data modeling
 
-  Schemaless sounds scary, but it is a nice tool for richer data modeling. For example, you can store hashes (where the keys present are not known ahead of time).
+Schemaless sounds scary, but it is a nice tool for richer data modeling. For example, you can store hashes (where the keys present are not known ahead of time).
 
-  In MongoDB your alternative to database joins is not just application joins, but also embedding. Stick a table within another table, or stick an array of tables in another table. Not only do you feel little pain from not having joins, but the embedding concept lets you model your data in very meaningful ways that are very efficient for your application queries. Instead of a join table, you could add an array of ids to one of your documents (tables). And you can treat that array like a Set.
+In MongoDB your alternative to database joins is not just application joins, but also embedding. Stick a table within another table, or stick an array of tables in another table. Not only do you feel little pain from not having joins, but the embedding concept lets you model your data in very meaningful ways that are very efficient for your application queries. Instead of a join table, you could add an array of ids to one of your documents (tables). And you can treat that array like a Set.
+
+The downside to embedding is that you have to *decide* how to model your data. In a relational database you can essentially defer some of this decision making until query time by performing joins. If you decide to change an embedding relationship, you will have some work on your hands (a good ODM/ORM can help to reduce the amount of code to be changed).
 
 
 ## Supplement vs. Default
@@ -55,13 +62,19 @@ NoSQL data stores are mostly used in very appropriate *supplementary* roles now.
 Lately I have been working with [YapTV](http://www.yap.tv). They have been running a hybrid MongoDB-MySQL architecture. Originally MongoDB was used for write intensive data and to cache responses. But YapTV keeps getting more comfortable with MongoDB, and MongoDB itself keeps maturing, YapTV is now moving as much of their data storage infrastructure from MySQL to MongoDB as possible.
 
 
-## An ORM is essential
+## An ODM (ORM) is essential
 
-MongoDB is schema-less. The drivers do a good job of supporting schema-less data, which can be very important for certain problems. However, for most problems we can create a good schema for much of the data in advance, and it is essential for our ORM to enforce it to avoid type errors. As a Rails developer, I don't view this as a downside- I am already used to ActiveRecord enforcing the schema and business rules.
+To save objects to a SQL database, we often use an ORM like ActiveRecord. In MongoDB we are supposed to call such a tool an ODM, where 'D' is for document.
 
-Mongoid is a fast maturing ORM for MongoDB. It is suprisingly easy to switch code from the new ActiveRecord Arel syntax to Mongoid- Mongoid uses some aspects of ActiveModel, and maintains a mostly compatible query api. There are certainly some rough edges still, but it is a mature enough solution today, and there is a growing community of users.
+MongoDB is schema-less. The drivers do a good job of supporting schema-less data, which can be very important for certain problems. However, for most problems we can create a good schema for much of the data in advance, and it is essential for our ODM to enforce it to avoid type errors.
 
-Sometimes you may need more performance than the ORM is capable of. In my tests I found using the raw ruby driver to be 10x faster than going through Mongoid. It also uses cursors by default to keep memory constant. But you have to be careful, particularly on inserts because you will bypass validations and can end up inserting the wrong types. I always start with Mongoid, and increase test coverage of the code in question before switching it to use the raw driver.
+In a database with a schema, if you saved a string to an integer field, the database could either complain or coerce the string to a integer. Either way, whenever you read a row, you know what type the value will be whenever you read data a row from the database. Another issue with schemaless is simply mis-typing the key (column) name. If you have a field called `referrer`, but you perform a query using `referer`, MongoDB won't know you have done anything wrong. In a SQL database you will get an error on insert and on querying. An ODM can instead be the one to tell you about the error.
+
+As a Rails developer, I don't view this as a downside- I am already used to ActiveRecord enforcing the schema and business rules.
+
+Mongoid is a fast maturing ODM for MongoDB. It is suprisingly easy to switch code from the new ActiveRecord Arel syntax to Mongoid- Mongoid uses some aspects of ActiveModel, and maintains a mostly compatible query api. There are certainly some rough edges still, but it is a mature enough solution today, and there is a growing community of users.
+
+Sometimes you may need more performance than the ODM is capable of. In my tests I found using the raw ruby driver to be 10x faster than going through Mongoid. The driver also uses cursors by default to keep memory constant. But you have to be careful when using the driver, particularly on inserts because you will bypass validations and can end up with schema errors described above. I always start with Mongoid, and increase test coverage of the code in question before switching it to use the raw driver.
 
 
 ## Quick MongoDB tips
@@ -82,4 +95,4 @@ I am discussing MongoDB in part out of my ignorance of alternative data stores, 
 
 ## Keep it asynchronous!
 
-Whatever data storage layer you use, try out an asynchronous/non-blocking driver. The next post will get into how you can really reap the rewards from non-blocking drivers.
+Whatever data storage layer you use, try out an asynchronous/non-blocking driver. [The next post](/posts/2011-06-16-high-performance-rb-part3) shows how to reap the rewards from non-blocking drivers.
