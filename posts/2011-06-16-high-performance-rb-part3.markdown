@@ -50,7 +50,9 @@ Unicorn and Phusion Passenger get around Ruby's inherit concurrency weaknesses b
 
 ## Threading/Forking and blocking requests
 
-When a request comes in to a web application it will block while trying to access the database instead of allowing other requests. Therefore a Rails application can only handle one request at a time or one request per OS thread/fork. This shows a potential solution to blocking IO- create another fork or OS thread! In practice, forks appear to be too expensive of a mechanism to take this concept very far at all. And MRI's GIL means threads only work in JRuby (and Rubinius 2.0). An OS can have an easy time scheduling hundreds of threads, making OS threads a possible solution, even if they are a bit heavy-weight (context switches are expensive when changing OS threads).
+When a request comes in to a web application it will block while trying to access the database instead of allowing other requests. Therefore a Rails application can only handle one request at a time or one request per OS thread/fork. This shows a potential solution to blocking IO- create another fork or OS thread! In practice, forks appear to be too expensive of a mechanism to take this concept very far. Threads are a viable option in JRuby and Rubinius 2.0. An OS can have an easy time scheduling hundreds of threads, making OS threads a possible solution, even if they are a bit heavy-weight (context switches are expensive when changing OS threads).
+
+We alread discuseed how MRI's GIL prevents threads from working across multi-core. But it is actually possible to use threads to [achieve asynchronous IO](http://yehudakatz.com/2010/08/14/threads-in-ruby-enough-already/) on a single core in Ruby. The problem is that badly behaving native extentions (like the original MySQL driver) will prevent this from happening. So you can achieve async IO with well behaved native extentions and one application instance per core (whereas with JRuby you only need one application instance per computer). But you will still be using heavy-weight OS threads. Rails has actually supported this for a while, but it has always been disabled by default.
 
 
 ## Evented
