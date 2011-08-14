@@ -89,33 +89,33 @@ Ruby's evented and non-blocking landscape actually make it easy to have a non-bl
   Thin    Sinatra
   Thin    Rails
 
-The ideas is not entirely new- [Cramp](https://github.com/lifo/cramp) has been around for a while. But it was created before Ruby 1.9- it seems to encourage using its own ORM and has some rough spots around EM integrations.
+The ideas is not entirely new- [Cramp](http://cramp.in) has been around for a while, however its initial version was not that compelling and not many in the Ruby community noticed it. Recently a new version has been released that focuses on streaming (WebSockets, Server-Sent Events). Using cramp is not an exclusive option- it is best for streaming actions of an application and other actions can be handled with a different framework.
 
 There is an exciting new [async Sinatra project](https://github.com/kyledrake/sinatra-synchrony) that appears to integrate seamlessly with Sinatra. In [some very simple benchmarks it performed very well](https://gist.github.com/999390). This [older async Sinatra](https://github.com/raggi/async_sinatra) project seems to have a little rougher integration.
 
 There is no reason why these techniques can't be applied to Rails. There is a [demo async Rails setup](https://github.com/igrigorik/async-rails).
 
-And now Rubyists can use Goliath, a new production ready asynchronous framework.
+Rubyists can also use Goliath, an asynchronous framework released by [Ilya Grigorik](www.igvita.com/), who has been very involved in pushing the asynchronous concept in the Ruby community.
 
 ### Goliath
 
-Although Goliath is not featureful, it is an async solution that I feel I can trust because PostRank has been using it in production for a long time. Its low-level nature means we can hope for speed closer to something like Rack than Sinatra. The future of Goliath is a little in question now- I am happy that Postrank, the developers of Goliath, got bought by Google, but Google does not use Ruby, so I would expect them to transition away from Ruby and become gradually more disengaged from Goliath. Fortunately there is a small but active community of users behind Goliath, and Goliath application code should be fairly easy to port to any other Ruby framework because it is mostly low-level Rack compatible code. I expected Goliath to be low-level, but I do have some complaints.
+Although Goliath is not featureful, it is an async solution that I feel I can trust because PostRank has been using it in production for a long time. Its low-level nature means we can hope for speed closer to something like Rack than Sinatra. It also means most Goliath application code should be fairly easy to port to any other Ruby framework because it is low-level Rack compatible code. The future of Goliath is a little in question now- I am happy that Postrank, the developers of Goliath, got bought by Google, but Google does not use Ruby. However, since that announcement the Goliath community has stayed active and released a new version.
 
-  * It is still a bit immature. Luckily code base is nice and I have been able to submit a few patches.
+Goliath It is still a bit immature. Luckily code base is nice and I was able to submit a few patches. And the community seems to be gradually addressing Goliath's weaknesses. Here are some specifi pain points:
+
   * configuration is a bit odd and difficult to load outside of Goliath
   * middleware
     - working with existing rack tools does not always work
-    - There is no halt like in Sinatra or around filters like in Rails- you are forced to put certain abstraction into middleware (unless you want to try adding around filters)- 
+    - There is no halt like in Sinatra or around filters like in Rails- you are forced to put certain abstraction into middleware (unless you want to try adding around filters).
+  * When I started using Goliath the middlewares did not have their own fiber! This means you can't contact a database for authentication, and can't rescue an exception. But I think this has been fixed in the latest gem release.
 
-For a framework that encourages everything to be done in middleware, it was strange for many of us to find out that the middlewares do not have their own fiber yet! This means you can't contact a database for authentication, and can't rescue an exception. But there is already a fork on github of Goliath that fixes this- expect it to be merged back to the main repo soon.
+I hope Goliath the server can be separated from the framework and be used for any async Rack framework. However, I haven't seen any indication of interest in this from the Goliath maintainters. I would like to be able to write fast code with Goliath, move to Sinatra when more features are needed, and move to Rails when many features are needed.
 
-I hope Goliath the server can be separated from the framework and be used for any async Rack framework. Then I can write fast code with Goliath, move to Sinatra when more features are needed, and move to Rails when many features are needed.
-
-I wish I had gone the async Sinatra route, but that option was not available when I started with Goliath. *Definitely* try this route (or the async rails route) if you have anything more than just an API (need to present a web interface to users).
+I wish I had gone the async Sinatra route so that I could leverage the conveniences of Sinatra, but that option was not available when I started with Goliath. I would definitely try this route (or the async rails route) for anything more than just an API (need to present a web interface to users). And for streaming capabilities Cramp appears to be a great option.
 
 ## The price of abstraction
 
-A simple Rack application is always going to be faster at a microbenchmark than a framework layered on top of it. In [these benchmakrs](https://github.com/DAddYE/web-frameworks-benchmark/wiki/Achiu) Sinatra is often 2-3x slower than Rack, and Rails is often 3-4x slower than Sinatra. Goliath is really an asynchronous extension on top of Rack, so I would expect it to perform noticeably better than an asynchronous Sinatra solution.
+A simple Rack application is always going to be faster at a microbenchmark than a framework layered on top of it. In [these benchmakrs](https://github.com/DAddYE/web-frameworks-benchmark/wiki/Achiu) Sinatra is often 2-3x slower than Rack, and Rails is often 3-4x slower than Sinatra. Goliath is in the style of low-level Rack code, so I would expect it to perform noticeably better than an asynchronous Sinatra solution.
 
 
 ## Ruby's future
