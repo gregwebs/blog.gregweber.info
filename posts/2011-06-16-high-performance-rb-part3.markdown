@@ -52,7 +52,7 @@ Unicorn and Phusion Passenger get around Ruby's inherit concurrency weaknesses b
 
 When a request comes in to a web application it will block while trying to access the database instead of allowing other requests. Therefore a Rails application can only handle one request at a time or one request per OS thread/fork. This shows a potential solution to blocking IO- create another fork or OS thread! In practice, forks appear to be too expensive of a mechanism to take this concept very far. Threads are a viable option in JRuby and Rubinius 2.0. An OS can have an easy time scheduling hundreds of threads, making OS threads a possible solution, even if they are a bit heavy-weight (context switches are expensive when changing OS threads).
 
-We alread discuseed how MRI's GIL prevents threads from working across multi-core. But it is actually possible to use threads to [achieve asynchronous IO](http://yehudakatz.com/2010/08/14/threads-in-ruby-enough-already/) on a single core in Ruby. The problem is that badly behaving native extentions (like the original MySQL driver) will prevent this from happening. So you can achieve async IO with well behaved native extentions and one application instance per core (whereas with JRuby you only need one application instance per computer). But you will still be using heavy-weight OS threads. Rails has actually supported this for a while, but it has always been disabled by default.
+We already discuseed how MRI's GIL prevents threads from working across multi-core. But it is actually possible to use threads to [achieve asynchronous IO](http://yehudakatz.com/2010/08/14/threads-in-ruby-enough-already/) on a single core in Ruby. The problem is that badly behaving native extentions (like the original MySQL driver) will prevent this from happening. So you can achieve async IO with well behaved native extentions and one application instance per core (whereas with JRuby you only need one application instance per computer). Although I don't view them as the ideal solution because they are more expensive than application threads, OS threads are a reasonable approach to concurrency for most web applications which can benefit from asynchronous IO but are still using a fair amount of CPU. They may be easier to incorporate with existing code which uses blocking IO. Rails has actually supported this for a while, but it has always been disabled by default.
 
 
 ## Evented
@@ -125,21 +125,22 @@ MRI 1.9 is still king because of its fibers, but those fibers won't spread acros
 
 ## Other languages alternatives.
 
-Language   Non-blocking            Multi-core
---------- ------------------       --------------------
-Java       with OS threads         with OS threads
-JRuby      with OS threads         with OS threads
-Ruby       non-blocking Fiber libs Single core
-Python     non-blocking libs       Single core
-Node.js    non-blocking libs       Single core
-Erlang     built into runtime      Multi core
-Haskell    built into runtime      Multi core
+Language   Non-blocking              Multi-core
+-------- --------------------------- --------------------
+Java     with OS threads or Akka lib with OS threads or Akka lib
+JRuby    with OS threads             with OS threads
+Ruby     non-blocking Fiber libs     Single core
+Python   non-blocking libs           Single core
+Node.js  non-blocking libs           Single core
+Erlang   built into runtime          Multi core
+Haskell  built into runtime          Multi core
 
 Obviously there are going to be more possibilities here. I will speak to what I know a little about.
 
 * Python - a similar situation as Ruby, with evented web frameworks like Twisted and Tornado on the rise.
 * Node.js - async I/O, but you have to deal with it manually because it doesn't have fibers like Ruby. Really there is no reason to use Node.js anymore unless programming in javascript is such an imperative that you want to deal with the asynchronous flow. It does perform better than Goliath, but if you really need that you may as well use Erlang or Haskell.
 * Java - can Ruby actually scale better than Java now? Java will always have a *raw* speed advantage, but it relies purely on OS threads. So it can take on only as many simultaneous users with blocking database requests as the OS can schedule threads. Java's raw speed may makeup for the overhead of OS threads. But I suspect someone could create an IO heavy benchmark that Ruby can beat Java on in terms of requests per second. Perhaps not now, but instead when there is a mature multi-core Rubinius implementation.
+* Java/JRuby + [Akka](http://akka.io/) - Akka is a concurrency library for Java featuring Actors, STM, and fault tolerance, attempting to put Java at Erlang's level. It can be [integrated with JRuby](http://metaphysicaldeveloper.wordpress.com/2010/12/16/high-level-concurrency-with-jruby-and-akka-actors/).
 * Erlang  - non-blocking I/O by default, runtime that scales actors to multi-core. Amazing distributed system capabilities (that your web application probably doesn't need).
 * Haskell - non-blocking I/O by default, runtime that scales cheap threads to multi-core. It is a compiled language capable of very fast execution. I am a contributor to the [Yesod web framework](http://yesodweb.com), which is [much, much faster](http://www.yesodweb.com/blog/preliminary-warp-cross-language-benchmarks) than Goliath, and scales better than any web application server I know of.
 
