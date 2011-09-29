@@ -6,11 +6,19 @@ tags: ruby,fibers,io
 
 This is part 3 of a series. [Part 1](/posts/2011-06-03-high-performance-rb-part1) was on fibers, enumerators and scalable XML parsing, and shows other benefits to fibers.
 
+
 # Ruby web application performance
 
-Ruby on Rails is a beautiful web framework that if anything has shown that programmer productivity is normally much more valuable than web application performance. Rails is one of the worst performing options available (although roughly tied with some other dynamic language frameworks). But for many applications, its performance is fine. And there are always caching layers that can be added to make a web application faster. In addition, it is always conceptually simple to scale a web *application*- just get more application servers- the difficult bottlenecks often come down to the database.
+Ruby on Rails is a web framework that if anything has shown that programmer productivity is normally much more valuable than web application performance. Rails is one of the worst performing options available (although roughly tied with some other dynamic language frameworks). But for many applications, its performance is fine. And there are always caching layers that can be added to make a web application faster. In addition, it is always conceptually simple to scale a web *application*- just get more application servers- the difficult bottlenecks often come down to the database.
 
 Yet the performance issues still translate to more complicated deployment setups for even the simplest of applications. What I am hoping the Ruby community can achieve is the same ease of programming of Rails, but with easier deployment and *much* better scalability. But lets step back and look at the situation we are in.
+
+
+# CPU bound vs IO bound
+
+IO bound means your program doesn't do anything while it waits for network or disk access.
+If your application is CPU bound, this article doesn't have much to offer you. The good news is that non-blocking IO will not hurt you in that case, even if it doesn't help you.
+
 
 # Web Server deployment architectures
 
@@ -42,17 +50,20 @@ With these servers, Rails could only handle one request at a time. To handle fou
 
 Rails is now thread safe, and JRuby can take advantage of this by running a Rails application on a multi-core machine using Java threads. JRuby also has an entirely different set of Java deployment options. See the end of this post for an explanation of Java deployment architecture. Here is [a benchmark](http://torquebox.org/news/2011/02/23/benchmarking-torquebox/) demonstrating that JRuby deployment options can have superior performance characteristics to most MRI deployment techniques used today. Also note that this provides a valid comparison between unicorn/passenger/Thin.
 
-But the situation is not as rosy in MRI. In MRI 1.8 because Ruby threads were green threads that could not take advantage of multi-core. Event though one can create OS threads in 1.9, the [GIL still means this isn't a realistic option](http://www.igvita.com/2008/11/13/concurrency-is-a-myth-in-ruby/).
+But the situation is not as rosy in MRI. In MRI 1.8 because Ruby threads were green threads that could not take advantage of multi-core. Even though one can create OS threads in 1.9, the [GIL still means this isn't a realistic option](http://www.igvita.com/2008/11/13/concurrency-is-a-myth-in-ruby/).
+
 
 ## Forking
 
 Unicorn and Phusion Passenger get around Ruby's inherit concurrency weaknesses by using fork. Fork is an OS capability that allows one to clone a process, but for the memory to be copy-on-write. Copy-on-write means that forked processes can share memory until one of the processes writes to memory, at which point just the written memory will be copied. This results in dramatically lower memory usage than just creating a duplicate process. Each fork is a separate OS process and thus can be scheduled on a separate core, achieving concurrency while limiting memory bloat. And Unicorn and Passenger both do an excellent job of managing the forked processes, including zero downtime restarts. Passenger is a module for Nginx or Apache, so it is a nice option if you are already deploying one of those web servers. [Passenger Nginx may perform a bit better than Passenger Apache](http://snaprails.tumblr.com/post/444462071/passenger-benchmark-on-apache-nginx). Unicorn, on the other hand is its own forking web server.
 
+Unfortunately, the only Ruby garbage collector that is copy on write friendly is REE, which is the default version of Ruby used in Passenger. [This article has a good overview of Ruby concurrency](http://essenceandartifact.blogspot.com/2011/09/sad-state-of-concurrency-in-ruby-192.html). Normal Ruby garbage collectors are not copy on write friendly because they update objects when they run. So you don't end up with as much memory savings, although it still can be a convenient deployment strategy.
+
 ## Threading/Forking and blocking requests
 
-When a request comes in to a web application it will block while trying to access the database instead of allowing other requests. Therefore a Rails application can only handle one request at a time or one request per OS thread/fork. This shows a potential solution to blocking IO- create another fork or OS thread! In practice, forks appear to be too expensive of a mechanism to take this concept very far. Threads are a viable option in JRuby and Rubinius 2.0. An OS can have an easy time scheduling hundreds of threads, making OS threads a possible solution, even if they are a bit heavy-weight (context switches are expensive when changing OS threads).
+When a request comes in to a web application it will block while trying to access the database instead of allowing other requests. Therefore a Rails application can only handle one request at a time or one request per OS thread/fork. This shows a potential solution to blocking IO- create another fork or OS thread! In practice, forks appear to be too expensive of a mechanism to take this concept very far at all. Threads are a viable option in JRuby and Rubinius 2.0. An OS can have an easy time scheduling hundreds of threads, making OS threads a possible solution, even if they are a bit heavy-weight (context switches are expensive when changing OS threads compared to more light-weight threads).
 
-We already discuseed how MRI's GIL prevents threads from working across multi-core. But it is actually possible to use threads to [achieve asynchronous IO](http://yehudakatz.com/2010/08/14/threads-in-ruby-enough-already/) on a single core in Ruby. The problem is that badly behaving native extentions (like the original MySQL driver) will prevent this from happening. So you can achieve async IO with well behaved native extentions and one application instance per core (whereas with JRuby you only need one application instance per computer). Although I don't view them as the ideal solution because they are more expensive than application threads, OS threads are a reasonable approach to concurrency for most web applications which can benefit from asynchronous IO but are still using a fair amount of CPU. They may be easier to incorporate with existing code which uses blocking IO. Rails has actually supported this for a while, but it has always been disabled by default.
+We already discuseed how MRI's GIL prevents threads from working across multi-core. But it is actually possible to use threads to [achieve asynchronous IO](http://yehudakatz.com/2010/08/14/threads-in-ruby-enough-already/) on a single core in Ruby. For standard use of IO, Ruby will suspend the current thread and let another one run. The problem is that badly behaving native extentions (like the original MySQL driver) will prevent this from happening. So you can achieve async IO with well behaved native extentions and one application instance per core (whereas with JRuby you only need one application instance per computer). Although I don't view them as the ideal solution because they are more expensive than application threads, OS threads are a reasonable approach to concurrency for most web applications which can benefit from asynchronous IO and don't want to deal with the hassles of the evented option. They may be easier to incorporate with existing code which uses blocking IO. Rails has actually supported this for a while, but it has always been disabled by default.
 
 
 ## Evented
@@ -68,7 +79,7 @@ The alternative to the Goliath server is Thin. Thin is an evented Ruby web serve
 
 ## non-blocking IO and fibers
 
-Just because your evented web server can handle thousands of requests per second still doesn't mean your app can handle more than a few requests per second. The culprit is blocking IO. When there is a call to the database, the application will just wait for the response, performing no useful work and not taking on another request.
+Just because your evented web server can handle thousands of requests per second still doesn't mean your app can handle more than a few requests per second. The culprit may be blocking IO. When there is a call to the database, the application will just wait for the response, performing no useful work and not taking on another request.
 
 The solution is to use non-blocking IO so that another thread of execution can work while one is waiting on IO. node.js is well known for doing this. However, the callback style used by node.js is much more difficult to write, maintain, and reason about, particularly when there are multiple IO actions in one request. Instead of a simple, synchronous flow, you have to have a callback for every IO action. Ruby was always fundamentally capable of non-blocking IO, especially after EventMachine was released, but that style of programming was never appealing.
 
@@ -93,7 +104,7 @@ The ideas is not entirely new- [Cramp](http://cramp.in) has been around for a wh
 
 There is an exciting new [async Sinatra project](https://github.com/kyledrake/sinatra-synchrony) that appears to integrate seamlessly with Sinatra. In [some very simple benchmarks it performed very well](https://gist.github.com/999390). This [older async Sinatra](https://github.com/raggi/async_sinatra) project seems to have a little rougher integration.
 
-There is no reason why these techniques can't be applied to Rails. There is a [demo async Rails setup](https://github.com/igrigorik/async-rails).
+There is no fundamental reason I know of why these techniques can't be applied to Rails. There is a [demo async Rails setup](https://github.com/igrigorik/async-rails).
 
 Rubyists can also use Goliath, an asynchronous framework released by [Ilya Grigorik](www.igvita.com/), who has been very involved in pushing the asynchronous concept in the Ruby community.
 
@@ -106,10 +117,9 @@ Goliath It is still a bit immature. Luckily code base is nice and I was able to 
   * configuration is a bit odd and difficult to load outside of Goliath
   * middleware
     - working with existing rack tools does not always work
-    - There is no halt like in Sinatra or around filters like in Rails- you are forced to put certain abstraction into middleware (unless you want to try adding around filters).
-  * When I started using Goliath the middlewares did not have their own fiber! This means you can't contact a database for authentication, and can't rescue an exception. But I think this has been fixed in the latest gem release.
+    - There is no halt like in Sinatra or around filters like in Rails- you are forced to put certain abstraction into middleware (unless you want to try adding these kinds of filters yourself).
 
-I hope Goliath the server can be separated from the framework and be used for any async Rack framework. However, I haven't seen any indication of interest in this from the Goliath maintainters. I would like to be able to write fast code with Goliath, move to Sinatra when more features are needed, and move to Rails when many features are needed.
+From the start I assumed that Goliath the server would be separated from Goliath the framework. However, I haven't seen any indication of interest in this from the Goliath maintainters. I would like to be able to write fast and simple code with Goliath, move to Sinatra when more features are needed, and move to Rails when many features are needed.
 
 I wish I had gone the async Sinatra route so that I could leverage the conveniences of Sinatra, but that option was not available when I started with Goliath. I would definitely try this route (or the async rails route) for anything more than just an API (need to present a web interface to users). And for streaming capabilities Cramp appears to be a great option.
 
@@ -139,12 +149,13 @@ Obviously there are going to be more possibilities here. I will speak to what I 
 
 * Python - a similar situation as Ruby, with evented web frameworks like Twisted and Tornado on the rise.
 * Node.js - async I/O, but you have to deal with it manually because it doesn't have fibers like Ruby. Really there is no reason to use Node.js anymore unless programming in javascript is such an imperative that you want to deal with the asynchronous flow. It does perform better than Goliath, but if you really need that you may as well use Erlang or Haskell.
-* Java - can Ruby actually scale better than Java now? Java will always have a *raw* speed advantage, but it relies purely on OS threads. So it can take on only as many simultaneous users with blocking database requests as the OS can schedule threads. Java's raw speed may makeup for the overhead of OS threads. But I suspect someone could create an IO heavy benchmark that Ruby can beat Java on in terms of requests per second. Perhaps not now, but instead when there is a mature multi-core Rubinius implementation.
-* Java/JRuby + [Akka](http://akka.io/) - Akka is a concurrency library for Java featuring Actors, STM, and fault tolerance, attempting to put Java at Erlang's level. It can be [integrated with JRuby](http://metaphysicaldeveloper.wordpress.com/2010/12/16/high-level-concurrency-with-jruby-and-akka-actors/).
-* Erlang  - non-blocking I/O by default, runtime that scales actors to multi-core. Amazing distributed system capabilities (that your web application probably doesn't need).
-* Haskell - non-blocking I/O by default, runtime that scales cheap threads to multi-core. It is a compiled language capable of very fast execution. I am a contributor to the [Yesod web framework](http://yesodweb.com), which is [much, much faster](http://www.yesodweb.com/blog/preliminary-warp-cross-language-benchmarks) than Goliath, and scales better than any web application server I know of.
+* Java - relies purely on OS threads. So it can take on only as many simultaneous users with blocking database requests as the OS can schedule threads. 
+* Java/JRuby - JRuby gets what Java has. Fiber support is mapped to Java (OS) threads.
+* Java + [Akka](http://akka.io/) - Akka is a concurrency library for Java featuring Actors, STM, and fault tolerance, attempting to put Java at Erlang's level. It can be [integrated with JRuby](http://metaphysicaldeveloper.wordpress.com/2010/12/16/high-level-concurrency-with-jruby-and-akka-actors/).
+* Erlang  - non-blocking I/O by default, runtime that scales actors to multi-core. Amazing distributed system capabilities (that your web application front-end probably doesn't need).
+* Haskell - non-blocking I/O by default, runtime that scales cheap threads to multi-core. It is a compiled language capable of very fast execution. I am a contributor to the [Yesod web framework](http://yesodweb.com), which is [much faster](http://www.yesodweb.com/blog/preliminary-warp-cross-language-benchmarks) than dynamic languages or Java, and scales better than any web application server I know of.
 
 
 ## Conclusion
 
-Use MRI 1.9 rather than MRI 1.8 on all new projects, and use asynchronous drivers for your database and any other IO. And try out an asynchronous web framework and help make it better. We need to make non-blocking IO the default, at which point Ruby applications will have a much easier time scaling. I know this isn't a magic bullet- you are still going to have to scale your database and make sure you don't blow up memory usage in your Ruby code. But it will translate to better performance, reduced memory consumption, and simpler deployments.
+Use MRI 1.9 rather than MRI 1.8 on all new projects, and try to use asynchronous drivers for your database and any other IO. And see if you can make your Rails app asynchronous or try async-sinatra. We need to make non-blocking IO the default, at which point Ruby applications will have a much easier time scaling IO bound workloads. I know this isn't a magic bullet- you are still going to have to scale your database and make sure you don't blow up memory usage in your Ruby code. But it will translate to better performance, reduced memory consumption, and simpler deployments.
