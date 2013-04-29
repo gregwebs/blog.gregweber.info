@@ -5,3 +5,6 @@ new-posts
 
 *.hi
 *.o
+
+cabal-dev/
+.hsenv/
