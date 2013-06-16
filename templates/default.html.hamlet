@@ -3,11 +3,13 @@
 <html lang="en" xml:lang="en" xmlns="http://www.w3.org/1999/xhtml">
   <head>
     <meta content="text/html; charset=UTF-8" http-equiv="Content-Type">
-    <title>#{blogTitle} - #{title}
-    <link href="/css/screen.css" rel="stylesheet" type="text/css">
-    <link href="/css/syntax.css" rel="stylesheet" type="text/css">
-    <link href="/rss/all.xml" rel="alternate" title="#{blogTitle}" type="application/rss+xml">
-    <link href="/atom/all.atom" rel="alternate" title="#{blogTitle}" type="application/atom+xml">
+    <title>#{blogTitle} - #{pageTitle pc}
+
+    ^{pageHead pc}
+
+    <link href=@{RssR}  rel="alternate" title="#{blogTitle}" type="application/rss+xml">
+    <link href=@{AtomR} rel="alternate" title="#{blogTitle}" type="application/atom+xml">
+
     <!--[if lt IE 9]>
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>
     \<![endif]-->
@@ -26,15 +28,15 @@
   <body>
     <div id="wrap">
       <header>
-        <h1 .blog-title>#{blogTitle}
+        <h1.blog-title>#{blogTitle}
       <nav#top>
-        <a href="#{root}/">Home
-        <a href="#{root}/posts">All posts
+        <a href=@{HomeR}>Home
+        <a href=@{PostsR}>All posts
       <div id="page">
         <div id="content">
-          #{body}
+          ^{pageBody pc}
         <aside>
-          #{sidebar}
+          ^{sidebar}
       <footer>
         <hr>
         <p>

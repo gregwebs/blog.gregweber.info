@@ -11,12 +11,24 @@ cabal-version:   >= 1.6
 build-type:      Simple
 homepage:        http://blog.gregweber.info
 
-executable hakyll
-  Main-is: hakyll.hs
-  build-depends:   base
-                 , containers
-                 , hakyll < 3
-                 , hamlet >= 0.7
+executable static-pages
+  Main-is: static-pages.hs
+  extensions: OverloadedStrings
+  build-depends:   base  >= 4.5
+                 , yesod >= 1.2
+                 , yesod-static
+                 , shakespeare-text
+                 , markdown
+                 , wai-static-pages >= 0.2
+                 , text
+                 , blaze-html
+                 , data-default
+                 , template-haskell
+                 , hamlet
+                 , yaml
+                 , unordered-containers
+                 , shelly
+                 , system-filepath
 
 source-repository head
   type:     git 

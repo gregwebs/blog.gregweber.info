@@ -4,7 +4,7 @@
     <time datetime=#{dateTime} pubdate>
       <strong>#{date}
     <p>Tagged as: #{tags}.
-  #{body}
+  #{content}
 
   <#disqus_thread>
   <script type="text/javascript">
