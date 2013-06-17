@@ -9,7 +9,7 @@
   <#disqus_thread>
   <script type="text/javascript">
     \if( !window.location.toString().match(/localhost/) ){
-    \(function() { var disqus_identifier = '#{url}';
+    \(function() { var disqus_identifier = '@{PostR url}';
     \var dsq = document.createElement('script'); dsq.type = 'text/javascript'; dsq.async = true;
     \dsq.src = 'http://gregweberblog.disqus.com/embed.js';
     \(document.getElementsByTagName('head')[0] || document.getElementsByTagName('body')[0]).appendChild(dsq);

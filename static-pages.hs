@@ -19,7 +19,7 @@ import Data.Monoid ((<>), mempty)
 import Text.Hamlet (hamletFile)
 
 import Shelly
-import Filesystem.Path.CurrentOS (encodeString)
+import Filesystem.Path.CurrentOS (encodeString, dropExtension, replaceExtensions)
 import qualified Data.Text.Lazy as LT
 import qualified Data.HashMap.Strict as M
 
@@ -59,10 +59,10 @@ mkYesod "StaticPages" [parseRoutes|
 -- | TODO: perhaps can inspect the routes
 staticPageRoutePaths :: [T.Text]
 staticPageRoutePaths = parseRoutePaths [st|
-/
+-- /
 /posts
-/rss/all.xml
-/atom/all.xml
+-- /rss/all.xml
+-- /atom/all.xml
 |]
 
 blogTitle, blogAuthor :: Text
@@ -82,35 +82,43 @@ instance Yesod StaticPages where
         hamletToRepHtml $(hamletFile "templates/default.html.hamlet")
 
 
-getHomeR :: Handler RepHtml
+getHomeR :: Handler Html
 getHomeR = do
-  posts <- liftIO $ getPosts
+  posts <- liftIO getPosts
   let body = "" :: Html
   let tagcloud = "" :: Html
   defaultLayout $ do
     setTitle "Home"
     $(whamletFile "templates/index.html.hamlet")
 
-getPostR :: Text -> Handler RepHtml
+getPostR :: Text -> Handler Html
 getPostR post = do
-  (frontMatter, content) <- liftIO $ renderMarkdownFile $ fromText post
+  let urlFp = fromText post
+  let url = toTextIgnore urlFp
+  (frontMatter, content) <- liftIO $ renderMarkdownFile urlFp
+  let date = LT.intercalate "-" $ take 3 $ LT.splitOn "-" url
+  let dateTime = date
+  let title = lookupMempty "title" frontMatter
   let tags = lookupMempty "tags" frontMatter
   defaultLayout $ do
-    setTitle $ toHtml $ lookupMempty "title" frontMatter
-    $(whamletFile "templates/index.html.hamlet")
+    setTitle $ toHtml title
+    $(whamletFile "templates/post.html.hamlet")
   where
     lookupMempty = M.lookupDefault mempty
 
 getPosts = liftM (reverse . sort) $ shelly $ find "posts"
 
-getTagR :: Text -> Handler RepHtml
+getTagR :: Text -> Handler Html
 getTagR tag = undefined
 
-getPostsR :: Handler RepHtml
+getPostsR :: Handler Html
 getPostsR = do
-  posts <- liftIO $ getPosts
-  let postItem = $(hamletFile "templates/post-item.html.hamlet")
-  $(hamletFile "templates/posts.html.hamlet")
+  let title = "All Posts"
+  posts <- liftIO getPosts
+  let body = "" :: Text
+  -- let postItem = $(hamletFile "templates/post-item.html.hamlet")
+  defaultLayout $ do
+    $(whamletFile "templates/posts.html.hamlet")
 
 getRssR :: Handler RepXml
 getRssR = undefined
@@ -123,6 +131,6 @@ main = do
   app <- toWaiAppPlain $ StaticPages undefined
   let renderPages = renderStaticPages app "site/"
   renderPages staticPageRoutePaths 
-  postPaths <- getPosts
+  postPaths <- map dropExtension `fmap` getPosts
   renderPages (map (LT.toStrict . toTextIgnore) postPaths)
   -- tagsPaths <- undefined

@@ -18,8 +18,8 @@ executable static-pages
                  , yesod >= 1.2
                  , yesod-static
                  , shakespeare-text
-                 , markdown
-                 , wai-static-pages >= 0.2
+                 , markdown-kate
+                 , wai-static-pages >= 0.2.0.1
                  , text
                  , blaze-html
                  , data-default

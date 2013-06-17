@@ -1,5 +1,8 @@
 _cache/
 _site/
+site/
+siatic/combined/
+.shelly/
 dist/
 new-posts
 

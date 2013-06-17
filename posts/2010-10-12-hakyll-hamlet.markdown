@@ -50,30 +50,30 @@ I think that improvements can be made so that writing the site configuration can
 Jasper Van der Jeugt, the author has been responsive about my patches and ideas to improve things, and is continuing to actively develop Hakyll.
 My biggest complaint right now is that there isn't a simple way to render templates within other templates. For my sidebar I have to use "dummy" strings.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.haskell}
+``` haskell
 let withSidebar = flip combine $ do
   let list = createPostListing "dummy" (take 3 renderablePosts) [("title", Left "Recent Posts")]
       sidebar = renderAndConcat ["templates/sidebar.html.hamlet"] [list]
   createCustomPage "dummy" [("sidebar", Right sidebar)]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 I then added even more to my sidebar and that motivated creating what I think are missing functions in hakyll.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.haskell}
+``` haskell
 pageToString template page = renderAndConcat [template] [page]
 
 templateToString template substitutions = pageToString template $
     createCustomPage "dummy" $ map (\(a,b) -> (a, Right b)) $ substitutions
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 This gives a decent alist interface to rendering a template.
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.haskell}
+``` haskell
 let sidebar = templateToString "templates/sidebar.html.hamlet" [
                   ("recentPosts", recentPosts)
                 , ("menu", menu)
                 ]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 My config file now violates the Hakyll philosophy that a site configuration should be < 100 lines.
 I could envision haskellers writing their blogs and other simple sites in Hakyll and sharing their configuraiton file settings, much like in Xmonad.
