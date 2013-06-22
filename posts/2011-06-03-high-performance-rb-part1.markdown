@@ -23,7 +23,7 @@ By the end of this series you should be convinced of the importance of fibers. U
 
 I have led a sheltered life: I had to do very little XML processing in Ruby until recently. Recently I had to deal with huge XML files that can't fit into memory, and I was appalled at the available XML tools. Lets start with a quick review of the main libraries. ReXML is a pure Ruby library, and thus horribly slow compared to the C alternatives: it isn't a realistic option. The other option is to use a library that wraps libxml (a fast C library), of which Nokogiri seems to be the most popular and best maintained. But we are still talking about raw performance. What is even more important to us for a large file is constant memory usage. To achieve this, we must use a SAX parser or a pull parser (very similar). However, once we commit to a SAX parser, all the nicities we expect from Ruby go away. We get 3 notification from the SAX parser: when an element starts, when it ends, and what inner content there is. This would be fine, except that we have to manually keep track of which element we are using:
 
-~~~~~~~~~~~~~~~~~~~~~~~~ {.ruby}
+``` ruby
   def start_element tag, attributes
     case tag
     when 'name'
@@ -40,39 +40,39 @@ I have led a sheltered life: I had to do very little XML processing in Ruby unti
   def characters text
     @model[@attribute] = text
   end
-~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 
 This kind of coding just shouldn't be acceptable today. Other Rubyists have felt this pain and created tools to automatically handle the mapping of XML to Ruby objects. Once such library is sax-machine. Unfortunately, sax-machine, like all the other XML mappers I came across does not operate in constant memory. Even though the SAX parser does, a sax-machine program will buildup Ruby objects until it is done parsing the file, effectively negating the point of SAX parsing, and giving horrible performance for large files.
 
 The solution to this is to process our objects one-by-one and discard the old ones, just as a SAX parser can process a file line-by-line and discard the old lines. We had an array of Ruby objects, but now we want a stream of them. In Ruby 1.8 we would have to use Ruby's yield and the Enumerable API, exposing an API for application code like this:
 
-~~~~~~~~~~~~~~~~~~~~~~~~ {.ruby}
+``` ruby
   parse do |object|
     object.save!
   end
-~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 And internally the library code would look like this.
 
-~~~~~~~~~~~~~~~~~~~~~~~~ {.ruby}
+``` ruby
   def parse &block
     yield get_next_object
   end
-~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 And this works fine for the most part. However, it does constrain our API, and we have to pass that block around in our library. To make a compatible API in the case of sax-machine, we need to return a lazy object that won't start parsing until the user requests the first object. The user's code now looks like this:
 
-~~~~~~~~~~~~~~~~~~~~~~~~ {.ruby}
+``` ruby
   parse.objects.each do |object|
     object.save!
   end
-~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 Ruby 1.9's fibers pausing and resuming allows us to manage our library without requiring a block from the library user. And using Ruby 1.9's enumerators (which are implemented with fibers!) wraps this up into a nice enumerator stream. Here is our calling point in sax-machine. Note that we can maintain the same API, but in one case use a lazy option to signify needing a stream.
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~ {.ruby}
+``` ruby
   def parse(thing, options = {}) 
     if options[:lazy]
       require 'fiber'
@@ -84,12 +84,12 @@ Ruby 1.9's fibers pausing and resuming allows us to manage our library without r
     end 
     self
   end 
-~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 
 Here is a simplified version of the old and new code for adding a parsed object:
 
-~~~~~~~~~~~~~~~~~~~~~~~~ {.ruby}
+``` ruby
   def add_object(obj)
     collection << obj
   end
@@ -97,11 +97,11 @@ Here is a simplified version of the old and new code for adding a parsed object:
   def add_object(obj)
     Fiber.yield obj
   end
-~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 And here is their old and new retrieval:
 
-~~~~~~~~~~~~~~~~~~~~~~~~ {.ruby}
+``` ruby
   def objects
     collection
   end
@@ -113,11 +113,11 @@ And here is their old and new retrieval:
       end
     end
   end
-~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 The end result is constant memory usage with the nice enumerator streaming API. Lets see it in action:
 
-~~~~~~~~~~~~~~~~~~~~~~~~ {.ruby}
+``` ruby
   class AtomEntry
     include SAXMachine
     element :title
@@ -141,7 +141,7 @@ The end result is constant memory usage with the nice enumerator streaming API. 
     # every time the block is called the next entry is parsed- no memory blow up! 
     # This is probably where you save the entry to a database
   end
-~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 This code is now in the [main sax-machine repo](https://github.com/ezkl/sax-machine)
 
