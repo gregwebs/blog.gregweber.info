@@ -7,8 +7,8 @@
 
     ^{pageHead pc}
 
-    <link href=@{RssR}  rel="alternate" title="#{blogTitle}" type="application/rss+xml">
-    <link href=@{AtomR} rel="alternate" title="#{blogTitle}" type="application/atom+xml">
+    <link href=/@{RssR}  rel="alternate" title="#{blogTitle}" type="application/rss+xml">
+    <link href=/@{AtomR} rel="alternate" title="#{blogTitle}" type="application/atom+xml">
 
     <!--[if lt IE 9]>
     <script src="http://html5shiv.googlecode.com/svn/trunk/html5.js"></script>

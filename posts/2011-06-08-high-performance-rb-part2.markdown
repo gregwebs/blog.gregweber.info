@@ -1,7 +1,7 @@
 ---
-title: High Performance Ruby Part 2: your default data store
-description: MongoDB is a fast and flexible alternative to SQL
-tags: ruby,mongodb
+title: "High Performance Ruby Part 2: your default data store"
+description: "MongoDB is a fast and flexible alternative to SQL"
+tags: "ruby,mongodb"
 ---
 
 This is part 2 of a series. [Part 1](/posts/2011-06-03-high-performance-rb-part1) was on fibers, enumerators and scalbale XML parsing. [Part 3](/posts/2011-06-16-high-performance-rb-part3) is on non-blocking IO and web application scalability.

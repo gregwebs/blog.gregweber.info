@@ -1,7 +1,7 @@
 ---
-title: High Performance Ruby Part 3: non-blocking IO and web application scalability
-description: Leveraging non-blocking IO to scale to thousands of simultaneous requests with evented web servers
-tags: ruby,fibers,io
+title: "High Performance Ruby Part 3: non-blocking IO and web application scalability"
+description: "Leveraging non-blocking IO to scale to thousands of simultaneous requests with evented web servers"
+tags: "ruby,fibers"
 ---
 
 This is part 3 of a series. [Part 1](/posts/2011-06-03-high-performance-rb-part1) was on fibers, enumerators and scalable XML parsing, and shows other benefits to fibers.

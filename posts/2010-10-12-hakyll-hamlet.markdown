@@ -1,6 +1,6 @@
 ---
-title: hakyll static blog engine with hamlet
-description: first blog.gregweber.info blog post. Explain how I am using the hakyll static blog engine with hamlet
+title: "hakyll static blog engine with hamlet"
+description: "first blog.gregweber.info blog post. Explain how I am using the hakyll static blog engine with hamlet"
 tags: haskell
 ---
 

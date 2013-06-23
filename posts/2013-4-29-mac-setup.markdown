@@ -1,4 +1,6 @@
-# A Linux developer on a Mac
+---
+title: "A Linux developer on a Mac"
+---
 
 I have used Windows, Mac & Linux. I don't like Windows at all, although I don't have much experience with the latest versions of Windows.
 I much prefer Linux to Mac. However, Linux driver support sucks: I have always had issues with my laptops. Mac provides solid hardware plus you can run Mac-only software.

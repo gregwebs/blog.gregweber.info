@@ -1,5 +1,5 @@
 <li>
-  <a href="#{root}/#{url}">#{title}
+  <a href="/#{url}">#{title}
   -
   <em>
     <time dateTime=#{dateTime}>#{date}

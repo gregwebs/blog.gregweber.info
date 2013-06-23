@@ -27,8 +27,9 @@ executable static-pages
                  , hamlet
                  , yaml
                  , unordered-containers
-                 , shelly
+                 , shelly >= 1.0
                  , system-filepath
+                 , safe
 
 source-repository head
   type:     git 

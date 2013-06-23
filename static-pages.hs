@@ -8,7 +8,7 @@ import Yesod.Static
 import Network.WAI.Application.StaticPages (parseRoutePaths, renderStaticPages)
 -- import Text.Hamlet
 import qualified Data.Text as T
-import Data.Text.Lazy (Text)
+import Data.Text (Text)
 import Text.Blaze.Html.Renderer.Text (renderHtml)
 import Control.Monad (forM_, liftM)
 
@@ -18,29 +18,61 @@ import Data.Monoid ((<>), mempty)
 
 import Text.Hamlet (hamletFile)
 
-import Shelly
-import Filesystem.Path.CurrentOS (encodeString, dropExtension, replaceExtensions)
+import Shelly hiding (trace)
+import Filesystem.Path.CurrentOS (encodeString, dropExtension, replaceExtensions, filename)
 import qualified Data.Text.Lazy as LT
 import qualified Data.HashMap.Strict as M
 
 import Data.Yaml (decode)
 import Data.Text.Encoding (encodeUtf8)
 import Data.List (sort)
+import Data.Maybe (fromJust)
+import Debug.Trace
+import Control.Monad (unless)
+import Safe
+import Data.Char (toUpper, toLower)
 
-default (LT.Text)
+default (Text)
+
+traceIt :: Show s => s -> s
+traceIt a = trace (show a) a
+
+renderMarkdownFileJust :: FilePath -> IO (((M.HashMap Text Text)), Html) -- HashMap is YAML frontmatter
+renderMarkdownFileJust filename = do
+  (frontMatter, html) <- renderMarkdownFile filename
+  unless (not (M.null frontMatter)) $ error "no front matter found"
+  return (frontMatter, html)
 
 -- what package should this go in?
-renderMarkdownFile :: FilePath -> IO ((M.HashMap Text Text), Html)
-renderMarkdownFile file = do
+renderMarkdownFile :: FilePath
+                   -> IO ((M.HashMap Text Text), Html) -- HashMap is YAML frontmatter
+renderMarkdownFile filename = do
     contents <- shelly (readfile filename)
-    let (frontMatter, rest) = case LT.stripPrefix "---" contents of 
+    let (frontMatter, rest) = case T.stripPrefix "---" contents of 
             Nothing -> (mempty, contents)
             Just firstMarkerStripped ->
-                LT.breakOn "---\n" (LT.stripStart firstMarkerStripped)
-    let mResult = decode $ encodeUtf8 $ LT.toStrict $ frontMatter
-    return (maybe M.empty id mResult, markdown def { msXssProtect = False } rest)
-  where
-    filename = "posts" </> file <.> "markdown"
+                T.breakOn "---\n" (T.stripStart firstMarkerStripped)
+    let mResult = decode $ encodeUtf8 $ frontMatter
+    return (maybe M.empty id mResult, markdown def { msXssProtect = False } $ LT.fromStrict rest)
+
+capitalize :: String -> String
+capitalize (c:str) = toUpper c : str
+
+
+data Tag = Ruby | Haskell | Deploy | Fibers | Mongodb | Yesod | Linux
+           deriving (Read, Show, Eq)
+
+instance PathPiece Tag where
+  toPathPiece = T.pack . map toLower . show
+  fromPathPiece = Just . readNote "tag piece" . capitalize . T.unpack
+
+data Post = Post
+     { postUrl :: Text
+     , postTitle :: Text
+     , postContent :: Html
+     , postDate :: Text
+     , postTags :: [Tag]
+     }
 
 
 data StaticPages = StaticPages {getStatic :: Static}
@@ -50,7 +82,7 @@ mkYesod "StaticPages" [parseRoutes|
 /                 HomeR   GET
 /posts            PostsR  GET
 /posts/#Text      PostR   GET
-/tags/#Text       TagR   GET
+/tags/#Tag        TagR   GET
 /rss/all.xml      RssR    GET
 /atom/all.xml     AtomR   GET
 |]
@@ -59,8 +91,11 @@ mkYesod "StaticPages" [parseRoutes|
 -- | TODO: perhaps can inspect the routes
 staticPageRoutePaths :: [T.Text]
 staticPageRoutePaths = parseRoutePaths [st|
--- /
+/
 /posts
+/tags/ruby
+/tags/haskell
+/tags/deploy
 -- /rss/all.xml
 -- /atom/all.xml
 |]
@@ -82,21 +117,34 @@ instance Yesod StaticPages where
         hamletToRepHtml $(hamletFile "templates/default.html.hamlet")
 
 
+-- renderPostItem :: Post -> Widget
+renderPostItem post = $(whamletFile "templates/post-preview.html.hamlet")
+  where
+    tags post = do
+      [whamlet|
+        $forall tag <- postTags post
+          <a href=@{TagR tag}>#{show tag}
+      |]
+
 getHomeR :: Handler Html
 getHomeR = do
-  posts <- liftIO getPosts
-  let body = "" :: Html
+  posts <- loadPosts
   let tagcloud = "" :: Html
+  let body = "" :: Html
   defaultLayout $ do
     setTitle "Home"
     $(whamletFile "templates/index.html.hamlet")
+
+dateTimeFromPostPath :: FilePath -> Text
+dateTimeFromPostPath url = 
+  T.intercalate "-" $ take 3 $ T.splitOn "-" $ toTextIgnore url
 
 getPostR :: Text -> Handler Html
 getPostR post = do
   let urlFp = fromText post
   let url = toTextIgnore urlFp
-  (frontMatter, content) <- liftIO $ renderMarkdownFile urlFp
-  let date = LT.intercalate "-" $ take 3 $ LT.splitOn "-" url
+  (frontMatter, content) <- liftIO $ renderMarkdownFileJust $ "posts" </> urlFp <.> "markdown"
+  let date = dateTimeFromPostPath urlFp
   let dateTime = date
   let title = lookupMempty "title" frontMatter
   let tags = lookupMempty "tags" frontMatter
@@ -106,19 +154,38 @@ getPostR post = do
   where
     lookupMempty = M.lookupDefault mempty
 
-getPosts = liftM (reverse . sort) $ shelly $ find "posts"
+getPostFiles = liftM (reverse . sort) $ shelly $ find "posts"
 
-getTagR :: Text -> Handler Html
-getTagR tag = undefined
+loadPosts = do
+    postFiles <- liftIO getPostFiles 
+    postMatters <- liftIO (mapM renderMarkdownFileJust postFiles)
+    return $ map mkPost (zip postFiles postMatters)
+  where
+    formattedDate p = postDate p
+    mkPost (fp, (frontMatter, html)) =
+      Post { postUrl = toTextIgnore  $ dropExtension fp
+           , postTitle = maybe "" id $ M.lookup "title" frontMatter 
+           , postContent = html
+           , postDate = dateTimeFromPostPath $ filename fp
+           , postTags = maybe [] readTags $ M.lookup "tags" frontMatter 
+           }
+    readTags = map (readNote "tagsplit") . map (capitalize) . map T.unpack . T.split (== ',') 
+
+getTagR :: Tag -> Handler Html
+getTagR tag = do
+    allPosts <- loadPosts
+    let posts = filter (\p -> tag `elem` postTags p) allPosts
+    let title = "Posts tagged " <> show tag
+    defaultLayout $ do
+      $(whamletFile "templates/posts.html.hamlet")
 
 getPostsR :: Handler Html
 getPostsR = do
-  let title = "All Posts"
-  posts <- liftIO getPosts
-  let body = "" :: Text
-  -- let postItem = $(hamletFile "templates/post-item.html.hamlet")
-  defaultLayout $ do
-    $(whamletFile "templates/posts.html.hamlet")
+    posts <- loadPosts
+    let title = "All Posts"
+    -- let postItem = $(hamletFile "templates/post-item.html.hamlet")
+    defaultLayout $ do
+      $(whamletFile "templates/posts.html.hamlet")
 
 getRssR :: Handler RepXml
 getRssR = undefined
@@ -131,6 +198,6 @@ main = do
   app <- toWaiAppPlain $ StaticPages undefined
   let renderPages = renderStaticPages app "site/"
   renderPages staticPageRoutePaths 
-  postPaths <- map dropExtension `fmap` getPosts
-  renderPages (map (LT.toStrict . toTextIgnore) postPaths)
+  postPaths <- map dropExtension `fmap` getPostFiles
+  renderPages $ map toTextIgnore postPaths
   -- tagsPaths <- undefined

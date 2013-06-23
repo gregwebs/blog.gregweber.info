@@ -1,6 +1,6 @@
 ---
-title: Automatic project building in haskell
-description: Struggling with automatically managing re-building of files as they are changed
+title: "Automatic project building in haskell"
+description: "Struggling with automatically managing re-building of files as they are changed"
 tags: haskell,linux
 ---
 

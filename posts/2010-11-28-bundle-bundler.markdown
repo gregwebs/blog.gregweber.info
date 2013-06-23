@@ -1,6 +1,6 @@
 ---
-title: how to bundle bundler
-description: how to lock down bundler to a specific version
+title: "how to bundle bundler"
+description: "how to lock down bundler to a specific version"
 tags: ruby
 ---
 

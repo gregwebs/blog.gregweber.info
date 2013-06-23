@@ -1,6 +1,6 @@
 ---
-title: Announcing Yesod 0.9
-description: A new version of Yesod, the premier Haskell web framework was just released
+title: "Announcing Yesod 0.9"
+description: "A new version of Yesod, the premier Haskell web framework was just released"
 tags: haskell
 ---
 

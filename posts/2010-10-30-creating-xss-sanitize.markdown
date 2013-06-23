@@ -1,6 +1,6 @@
 ---
-title: xss-sanitize - secure your html
-description: on creating my first Haskell library which sanitizes html
+title: "xss-sanitize - secure your html"
+description: "on creating my first Haskell library which sanitizes html"
 tags: haskell
 ---
 

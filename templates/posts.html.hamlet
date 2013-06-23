@@ -1,4 +1,9 @@
 <h2>#{title}
 <nav>
   <ul>
-    #{body}
+    $forall p <- posts
+      <li>
+        <a href="/#{postUrl p}">#{postTitle p}
+        -
+        <em>
+          <time dateTime=#{postDate p}>#{postDate p}

@@ -1,7 +1,7 @@
 ---
-title: Haskell sphinx client Upgraded
-description: Haskell sphinx client upgraded to sphinx version 1.1 and new features implemented
-tags: haskell,sphinx
+title: "Haskell sphinx client Upgraded"
+description: "Haskell sphinx client upgraded to sphinx version 1.1 and new features implemented"
+tags: "haskell"
 ---
 
 I upgraded the Haskell implementation of a [sphinx full text search](http://sphinxsearch.com) client and put it

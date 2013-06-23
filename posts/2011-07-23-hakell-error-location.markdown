@@ -1,6 +1,6 @@
 ---
-title: Haskell Error Location
-description: A Template Haskell version of error that tells you where the error is from
+title: "Haskell Error Location"
+description: "A Template Haskell version of error that tells you where the error is from"
 tags: haskell
 ---
 

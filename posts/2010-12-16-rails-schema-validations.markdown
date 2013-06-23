@@ -1,7 +1,7 @@
 ---
-title: announcing rails-schema-validations
-description: a ruby gem to automatically run validations based on your schema
-tags: ruby rails
+title: "announcing rails-schema-validations"
+description: "a ruby gem to automatically run validations based on your schema"
+tags: "ruby"
 ---
 
 I was on a project to create an administrative backend to a site that already had a well constrained schema. I wanted to keep things DRY, so I created a gem to automatically generate rails validations from schema constraints.  This code has been in production for months now- it is solid and lets us worry a lot less when there is a schema change.

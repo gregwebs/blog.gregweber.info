@@ -1,7 +1,7 @@
 ---
-title: High Performance Ruby Part 1: declarative & scalable XML parsing
-description: Applying Fibers to make sax-machine scale
-tags: ruby,xml
+title: "High Performance Ruby Part 1: declarative & scalable XML parsing"
+description: "Applying Fibers to make sax-machine scale"
+tags: "ruby"
 ---
 
 This is part 1 of a series. [Part 2](/posts/2011-06-08-high-performance-rb-part2) is on data storage.

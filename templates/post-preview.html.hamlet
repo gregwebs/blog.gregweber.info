@@ -1,9 +1,9 @@
 <article>
   <header>
     <h1>
-      <a href="#{root}/#{url}">#{title}
+      <a href="/#{postUrl post}">#{postTitle post}
     <strong>
-      <time datetime=#{dateTime}>#{date}
-    <p>Tagged as: #{tags}.
-  #{body}
-  <a href="#{root}/#{url}#disqus_thread">View Comments
+      <time datetime=#{postDate post}>#{postDate post}
+    <p>Tagged as: ^{tags post}.
+  #{postContent post}
+  <a href="/#{postUrl post}#disqus_thread">View Comments
