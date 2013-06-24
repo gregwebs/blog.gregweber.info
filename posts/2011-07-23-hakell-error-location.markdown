@@ -9,7 +9,7 @@ One of the most annoying things about Haskell is a lack of any useful informatio
 Template Haskell exposes a little known location data structure so that you can know exactly where the template haskell is being invoked, so my version of error that gives the file location looks about like this:
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.haskell}
+``` haskell
 {-# LANGUAGE TemplateHaskell #-}
 import Language.Haskell.TH.Syntax
 
@@ -26,20 +26,20 @@ err str = do
 
 > $(err "OH NO!")
 main:Main main.hs:16:1 OH NO!
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 
 I put a module up on Hackage called [file-location](http://hackage.haskell.org/package/file-location). It exposes the functions err (error), undef (undefined), and trc (Debug.Trace.trace). All of these behave the same as their normal counterpart but also spit out a location. I also included my favorite helper, debug, which is like trace but just show the value.
 
 
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.haskell}
+``` haskell
 debug :: Show a => a -> a
 debug x = trace ("DEBUG: " ++ show x) x
 
 > debug [1,2,3]
 DEBUG: [1,2,3]
 [1,2,3]
-~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
+```
 
 
 I am going to need a little help for the Template Haskell version of that one, but then I will include it also.
