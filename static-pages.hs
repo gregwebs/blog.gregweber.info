@@ -1,6 +1,13 @@
 {-# LANGUAGE TypeFamilies, TemplateHaskell, QuasiQuotes #-}
 {-# LANGUAGE ExtendedDefaultRules #-}
 {-# OPTIONS_GHC -fno-warn-type-defaults #-}
+-- | Major Generation Assumption: blog psots are stored in /posts
+-- With the format YYYY-MM-DD-title-name.markdown
+--
+-- Major Deployment assumption: Web server will serve up foo.html when it receives a request for foo
+-- index.html will be served at the root
+module Main where
+--
 import Yesod
 import Text.Shakespeare.Text
 import Text.Markdown
@@ -24,7 +31,6 @@ import qualified Data.HashMap.Strict as M
 import Data.Yaml (decode)
 import Data.Text.Encoding (encodeUtf8)
 import Data.List (sort)
-import Debug.Trace
 import Control.Monad (liftM, unless)
 import Safe
 import Data.Char (toUpper, toLower)
@@ -33,10 +39,13 @@ import Data.Time.Clock (getCurrentTime)
 import Yesod.AtomFeed
 import Yesod.RssFeed
 
-default (Text)
-
+{-
+import Debug.Trace
 traceIt :: Show s => s -> s
 traceIt a = trace (show a) a
+-}
+
+default (Text)
 
 renderMarkdownFileJust :: FilePath -> IO (((M.HashMap Text Text)), Html) -- HashMap is YAML frontmatter
 renderMarkdownFileJust fp = do
@@ -120,7 +129,8 @@ instance Yesod StaticPages where
                 css_screen_css
               , css_syntax_css
               ])
-        let recentPosts = ""
+        posts <- take 3 `fmap` liftIO loadPosts
+        let recentPosts = $(hamletFile "templates/recent-posts.html.hamlet")
         let menu = $(hamletFile "templates/menu.html.hamlet")
         let sidebar = $(hamletFile "templates/sidebar.html.hamlet")
         hamletToRepHtml $(hamletFile "templates/default.html.hamlet")
