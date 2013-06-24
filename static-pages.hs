@@ -30,11 +30,13 @@ import qualified Data.HashMap.Strict as M
 
 import Data.Yaml (decode)
 import Data.Text.Encoding (encodeUtf8)
-import Data.List (sort)
+import Data.List (sort, sortBy)
+import Data.Ord (comparing)
 import Control.Monad (liftM, unless)
 import Safe
 import Data.Char (toUpper, toLower)
 import Data.Time.Clock (getCurrentTime)
+import GHC.Exts (groupWith)
 
 import Yesod.AtomFeed
 import Yesod.RssFeed
@@ -75,8 +77,8 @@ capitalize (c:str) = toUpper c : str
 capitalize [] = []
 
 
-data Tag = Ruby | Haskell | Deploy | Fibers | Mongodb | Yesod | Linux | All
-           deriving (Read, Show, Eq)
+data Tag = Haskell | Deploy | Mongodb | Yesod | Linux | Ruby | Fibers | All
+           deriving (Read, Show, Eq, Ord)
 
 instance PathPiece Tag where
   toPathPiece = T.pack . map toLower . show
@@ -104,14 +106,19 @@ mkYesod "StaticPages" [parseRoutes|
 |]
 
 
--- | TODO: perhaps can inspect the routes
+-- | TODO: generate tag routes automatically
 staticPageRoutePaths :: [T.Text]
 staticPageRoutePaths = parseRoutePaths [st|
 /
 /posts
 /tags/ruby
 /tags/haskell
-/tags/deploy
+/tags/
+      deploy
+      mongodb
+      fibers
+      yesod
+      linux
 /rss/all
 /atom/all
 |]
@@ -121,33 +128,49 @@ blogTitle = "Greg Weber's Programming Blog"
 blogAuthor = "Greg Weber"
 
 instance Yesod StaticPages where
+    makeSessionBackend _ = return Nothing
     jsLoader _ = BottomOfBody
-    defaultLayout widget = do
-        pc <- widgetToPageContent $ do
-            widget
-            $(combineStylesheets 'StaticR [
-                css_screen_css
-              , css_syntax_css
-              ])
-        posts <- take 3 `fmap` liftIO loadPosts
-        let recentPosts = $(hamletFile "templates/recent-posts.html.hamlet")
-        let menu = $(hamletFile "templates/menu.html.hamlet")
-        let sidebar = $(hamletFile "templates/sidebar.html.hamlet")
-        hamletToRepHtml $(hamletFile "templates/default.html.hamlet")
+    defaultLayout widget = defLayout widget
 
+defLayout :: Widget -> Handler Html
+defLayout widget = do
+    pc <- widgetToPageContent $ do
+        widget
+        $(combineStylesheets 'StaticR [
+            css_screen_css
+          , css_syntax_css
+          ])
+    allPosts <- liftIO loadPosts
+
+    let tagCounts = reverse $ sortBy (comparing snd) $ map (\g -> (head g, length g)) $ groupWith id $ concatMap postTags allPosts
+    let tagCloud = [hamlet|
+              <section>
+                <h3>Tags
+                $forall (tag, count) <- tagCounts
+                  ^{tagLink tag}
+          |]
+    let posts = take 3 allPosts
+    let recentPosts = $(hamletFile "templates/recent-posts.html.hamlet")
+    let menu = $(hamletFile "templates/menu.html.hamlet")
+    let sidebar = $(hamletFile "templates/sidebar.html.hamlet")
+    hamletToRepHtml $(hamletFile "templates/default.html.hamlet")
+
+tagLink :: Tag -> HtmlUrl (Route StaticPages)
+tagLink tag = [hamlet|
+      <a href=@{TagR tag}>#{show tag}
+  |]
 
 renderPostItem :: Post -> Widget
 renderPostItem post = $(whamletFile "templates/post-preview.html.hamlet")
   where
     tags p = [whamlet|
         $forall tag <- postTags p
-          <a href=@{TagR tag}>#{show tag}
+          ^{tagLink tag}
       |]
 
 getHomeR :: Handler Html
 getHomeR = do
     posts <- liftIO loadPosts
-    let tagcloud = "" :: Html
     let body = "" :: Html
     defaultLayout $ do
       setTitle "Home"

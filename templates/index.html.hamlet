@@ -3,6 +3,3 @@
     ^{renderPostItem post}
   <hr>
   <a href=/@{PostsR}>All posts...
-  <hr>
-  <div>
-    #{tagcloud}
