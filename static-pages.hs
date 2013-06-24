@@ -120,7 +120,9 @@ instance Yesod StaticPages where
                 css_screen_css
               , css_syntax_css
               ])
-        let sidebar = [hamlet|<div>|]
+        let recentPosts = ""
+        let menu = $(hamletFile "templates/menu.html.hamlet")
+        let sidebar = $(hamletFile "templates/sidebar.html.hamlet")
         hamletToRepHtml $(hamletFile "templates/default.html.hamlet")
 
 
