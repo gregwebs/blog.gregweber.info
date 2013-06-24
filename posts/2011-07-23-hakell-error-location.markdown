@@ -29,7 +29,7 @@ main:Main main.hs:16:1 OH NO!
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~
 
 
-I put a module up on Hackage called [ErrorLocation](). It exposes the functions err (error), undef (undefined), and trc (Debug.Trace.trace). All of these behave the same as their normal counterpart but also spit out a location. I also included my favorite helper, debug, which is like trace but just show the value.
+I put a module up on Hackage called [file-location](http://hackage.haskell.org/package/file-location). It exposes the functions err (error), undef (undefined), and trc (Debug.Trace.trace). All of these behave the same as their normal counterpart but also spit out a location. I also included my favorite helper, debug, which is like trace but just show the value.
 
 
 ~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~~ {.haskell}
